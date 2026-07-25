@@ -1,0 +1,26 @@
+# --- ベンダーされたエージェントスキル（外部リポジトリ由来・888ファイル/15.5MB） ---
+.agents/
+.claude/skills/
+
+# --- 依存関係 ---
+node_modules/
+
+# --- HyperFrames の生成物 ---
+# 注: `*.mp4` のような全体除外は書かない。デッキに動画素材を置いた瞬間、
+#     コミットから静かに漏れて Vercel 上だけ壊れる。出力先ディレクトリだけ除外する。
+out/
+renders/
+.media/
+.hyperframes-cache/
+
+# --- OS / エディタ ---
+Thumbs.db
+Desktop.ini
+.DS_Store
+.vscode/
+.idea/
+
+# --- 環境変数 ---
+.env
+.env.*
+!.env.example

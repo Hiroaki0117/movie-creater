@@ -1,0 +1,13 @@
+{
+  "name": "hyperframes-slides",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "serve": "node scripts/build.mjs && node scripts/serve.mjs",
+    "dev": "npx --yes hyperframes@0.7.71 present ./composition",
+    "studio": "npx --yes hyperframes@0.7.71 preview ./composition",
+    "check": "npx --yes hyperframes@0.7.71 check ./composition",
+    "lint": "npx --yes hyperframes@0.7.71 lint ./composition"
+  }
+}

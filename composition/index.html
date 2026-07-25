@@ -1,0 +1,952 @@
+<!doctype html>
+<html lang="ja" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <!-- 相対パス。present（/composition/ 配下で配信）でも Vercel でも同じに解決する。
+         CDN 直参照だと、デプロイ後の表示が外部ホストの生死に依存してしまう。 -->
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #0b0e14;
+      }
+      :root {
+        --ink: #0b0e14;
+        --panel: #151c27;
+        --line: #26303f;
+        --text: #e8edf5;
+        --muted: #9aa7bb;
+        --teal: #4fd6c0;
+        --amber: #f5b942;
+        --violet: #b39dfa;
+        --sans: "Yu Gothic UI", "Yu Gothic", Meiryo, system-ui, sans-serif;
+        --mono: Consolas, "JetBrains Mono", Meiryo, ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--sans);
+        color: var(--text);
+      }
+
+      /* ---------- scene shell ----------
+         全シーンは既定で非表示。可視性コントローラが
+         root タイムラインの時刻を見てアクティブな1枚だけを出す。 */
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--ink);
+      }
+      .scene-frame {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        background:
+          radial-gradient(1200px 700px at 78% -12%, rgba(79, 214, 192, 0.13), transparent 62%),
+          radial-gradient(900px 600px at 4% 108%, rgba(179, 157, 250, 0.11), transparent 60%),
+          var(--ink);
+      }
+      .stage {
+        position: absolute;
+        inset: 0;
+        padding: 92px 128px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ---------- typography ---------- */
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-size: 36px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        color: var(--muted);
+      }
+      .eyebrow .num {
+        color: var(--teal);
+      }
+      .eyebrow .bar {
+        display: block;
+        width: 92px;
+        height: 4px;
+        background: var(--teal);
+        border-radius: 2px;
+      }
+      h2 {
+        margin-top: 34px;
+        font-size: 66px;
+        font-weight: 700;
+        line-height: 1.34;
+        letter-spacing: 0.01em;
+        max-width: 1560px;
+      }
+      h2.tight {
+        font-size: 58px;
+      }
+      .lede {
+        margin-top: 30px;
+        font-size: 42px;
+        line-height: 1.62;
+        color: var(--muted);
+        max-width: 1420px;
+      }
+
+      /* ---------- 登場と段階表示 ----------
+         いずれも「再生位置 t の純粋な関数」として CSS クラスで表現する。
+         命令的な GSAP トゥイーンで出すと、rAF が止まった瞬間（タブが背面、
+         ペイン非表示など）に opacity 0 のまま取り残されて二度と出てこない。 */
+      [data-anim] {
+        opacity: 0;
+        transform: translateY(28px);
+        transition:
+          opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+          transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .scene-frame.is-active [data-anim] {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* 段階表示。fragment 時刻を通過したら is-in が付く */
+      .frag {
+        opacity: 0;
+        transform: translateX(-24px);
+        transition:
+          opacity 0.32s ease-out,
+          transform 0.32s ease-out;
+      }
+      .frag.is-in {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* ---------- code ---------- */
+      .code {
+        font-family: var(--mono);
+        font-size: 40px;
+        line-height: 1.62;
+        background: #0e141d;
+        border: 2px solid var(--line);
+        border-radius: 20px;
+        padding: 40px 46px;
+        color: var(--text);
+        overflow: hidden;
+      }
+      .k {
+        color: var(--violet);
+      }
+      .a {
+        color: var(--teal);
+      }
+      .s {
+        color: var(--amber);
+      }
+      .c {
+        color: #6b7a90;
+      }
+
+      /* ---------- command rows ---------- */
+      .cmd {
+        display: flex;
+        align-items: baseline;
+        gap: 34px;
+        background: var(--panel);
+        border: 2px solid var(--line);
+        border-left: 8px solid var(--teal);
+        border-radius: 16px;
+        padding: 30px 38px;
+      }
+      .cmd .t {
+        font-family: var(--mono);
+        font-size: 40px;
+        color: var(--text);
+        white-space: nowrap;
+      }
+      .cmd .d {
+        font-size: 40px;
+        color: var(--muted);
+      }
+
+      /* ---------- attribute / ban cards ---------- */
+      .card {
+        background: var(--panel);
+        border: 2px solid var(--line);
+        border-radius: 20px;
+        padding: 34px 40px;
+      }
+      .card .name {
+        font-family: var(--mono);
+        font-size: 42px;
+        color: var(--teal);
+      }
+      .card .desc {
+        margin-top: 16px;
+        font-size: 40px;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+      .card.warn {
+        border-left: 8px solid var(--amber);
+      }
+      .card.warn .name {
+        color: var(--amber);
+      }
+
+      /* ---------- track diagram ---------- */
+      .trackrow {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+      }
+      .tracklabel {
+        font-family: var(--mono);
+        font-size: 40px;
+        color: var(--muted);
+        width: 330px;
+        flex: none;
+      }
+      .lane {
+        position: relative;
+        height: 82px;
+        flex: 1;
+        background: #101722;
+        border: 2px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .barfill {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        display: block;
+        border-radius: 8px;
+        transform-origin: left center;
+        transform: scaleX(0);
+        transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .scene-frame.is-active .barfill {
+        transform: scaleX(1);
+      }
+      .barlabel {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        padding-left: 26px;
+        font-family: var(--mono);
+        font-size: 34px;
+        color: #06131a;
+        font-weight: 700;
+      }
+
+      /* ---------- step flow ---------- */
+      .steps {
+        display: flex;
+        align-items: stretch;
+        gap: 22px;
+      }
+      .step {
+        flex: 1;
+        background: var(--panel);
+        border: 2px solid var(--line);
+        border-radius: 20px;
+        padding: 32px 26px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .step .sn {
+        font-family: var(--mono);
+        font-size: 36px;
+        color: var(--teal);
+      }
+      .step .st {
+        font-family: var(--mono);
+        font-size: 40px;
+        line-height: 1.3;
+      }
+      .step .sd {
+        font-size: 36px;
+        line-height: 1.45;
+        color: var(--muted);
+      }
+      .step.accent {
+        border-color: var(--amber);
+      }
+      .step.accent .sn {
+        color: var(--amber);
+      }
+
+      /* ---------- pipeline (slide 1) ---------- */
+      .pipe {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+      }
+      .node {
+        background: var(--panel);
+        border: 2px solid var(--line);
+        border-radius: 18px;
+        padding: 34px 44px;
+        font-family: var(--mono);
+        font-size: 44px;
+      }
+      .node.mid {
+        border-color: var(--teal);
+        color: var(--teal);
+      }
+      .arrow {
+        font-size: 48px;
+        color: var(--muted);
+      }
+
+      /* ---------- hotspot affordance ---------- */
+      .hint {
+        position: absolute;
+        right: 128px;
+        bottom: 78px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 38px;
+        color: var(--violet);
+        border: 2px dashed rgba(179, 157, 250, 0.55);
+        border-radius: 999px;
+        padding: 18px 34px;
+      }
+
+      .spacer {
+        flex: 1;
+      }
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="application/hyperframes-slideshow+json">
+      {
+        "slides": [
+          {
+            "sceneId": "hook",
+            "notes": "掴み。HyperFrames は動画編集ソフトではなく、HTML を入力とするレンダリングエンジンだと最初に言い切る。"
+          },
+          {
+            "sceneId": "install",
+            "notes": "前提は Node 22+ と FFmpeg の2つだけ。FFmpeg を入れ忘れると render だけが落ちる、と補足する。",
+            "fragments": [8.3, 8.6, 8.9]
+          },
+          {
+            "sceneId": "anatomy",
+            "notes": "ルートの data-duration が出力の尺を決める。クリップは class=\"clip\" が必須 — これが無いと表示制御が効かない。"
+          },
+          {
+            "sceneId": "timing",
+            "notes": "この3属性がスライドの核心。data-start と data-duration は秒、track-index は重なり順。1つずつ出す。",
+            "fragments": [30.3, 30.6, 30.9]
+          },
+          {
+            "sceneId": "tracks",
+            "notes": "同じトラックで時間が重なると z-index の解決が必要になる。番号が大きいほど手前。"
+          },
+          {
+            "sceneId": "gsap",
+            "notes": "paused であること、同期的に作ること、__timelines のキーが root であること。この3点を強調。",
+            "fragments": [54.3, 54.6]
+          },
+          {
+            "sceneId": "determinism",
+            "notes": "ここは一番よく事故る。なぜダメかを聞かれたら右下のホットスポットから分岐する。",
+            "fragments": [66.3, 66.6, 66.9],
+            "hotspots": [
+              {
+                "id": "why-determinism",
+                "label": "なぜ時計や乱数が使えないのか？",
+                "target": "determinism-detail",
+                "region": { "x": 60, "y": 78, "w": 34, "h": 13 }
+              }
+            ]
+          },
+          {
+            "sceneId": "cli",
+            "notes": "check は lint + runtime + layout + motion + contrast をまとめて走らせる。render はユーザー承認の後。",
+            "fragments": [80.3, 80.6, 80.9, 81.2]
+          },
+          {
+            "sceneId": "close",
+            "notes": "このデッキ自体が composition/index.html 1枚。ソースを開いて見せると効く。"
+          }
+        ],
+        "slideSequences": [
+          {
+            "id": "determinism-detail",
+            "label": "決定論ルールの詳細",
+            "slides": [
+              {
+                "sceneId": "det-why",
+                "notes": "「再生」ではなく「seek」。フレームは順番通りに来るとは限らない。"
+              },
+              {
+                "sceneId": "det-fix",
+                "notes": "無限ループは有限回に落とす。floor を使う — ceil だと data-duration を超えて lint に引っかかる。"
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+
+    <div
+      id="root"
+      data-composition-id="root"
+      data-start="0"
+      data-duration="118"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- ===================== 01 hook ===================== -->
+      <div
+        id="scene-hook"
+      class="scene-frame clip"
+      data-composition-id="hook"
+      data-start="0"
+      data-duration="8"
+      data-track-index="1"
+      data-label="01 はじめに"
+    >
+      <section class="stage">
+        <div class="eyebrow" data-anim>
+          <span class="bar"></span><span class="num">01</span><span>はじめに</span>
+        </div>
+        <h2 data-anim>HyperFrames は、HTML を動画のソース形式に変える</h2>
+        <p class="lede" data-anim>
+          HTML / CSS / JavaScript で組んだ画面に時間軸を与えると、それがそのまま MP4
+          になる。動画編集ソフトではなく、動画のためのレンダリングエンジンです。
+        </p>
+        <div class="spacer"></div>
+        <div class="pipe">
+          <div class="node" data-anim>index.html</div>
+          <div class="arrow" data-anim>→</div>
+          <div class="node mid" data-anim>hyperframes render</div>
+          <div class="arrow" data-anim>→</div>
+          <div class="node" data-anim>out.mp4</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ===================== 02 install ===================== -->
+    <div
+      id="scene-install"
+      class="scene-frame clip"
+      data-composition-id="install"
+      data-start="8"
+      data-duration="12"
+      data-track-index="1"
+      data-label="02 セットアップ"
+    >
+      <section class="stage">
+        <div class="eyebrow" data-anim>
+          <span class="bar"></span><span class="num">02</span><span>セットアップ</span>
+        </div>
+        <h2 data-anim>必要なのは Node 22+ と FFmpeg、あとは npx だけ</h2>
+        <div class="spacer"></div>
+        <div class="stack">
+          <div class="cmd frag" id="install-c1">
+            <span class="t">npx hyperframes init my-video</span>
+            <span class="d">— プロジェクトを作る</span>
+          </div>
+          <div class="cmd frag" id="install-c2">
+            <span class="t">npx hyperframes preview</span>
+            <span class="d">— ライブリロード付きで確認する</span>
+          </div>
+          <div class="cmd frag" id="install-c3">
+            <span class="t">npx hyperframes render</span>
+            <span class="d">— MP4 に書き出す（FFmpeg が要る）</span>
+          </div>
+        </div>
+        <div class="spacer"></div>
+      </section>
+    </div>
+
+    <!-- ===================== 03 anatomy ===================== -->
+    <div
+      id="scene-anatomy"
+      class="scene-frame clip"
+      data-composition-id="anatomy"
+      data-start="20"
+      data-duration="10"
+      data-track-index="1"
+      data-label="03 構造"
+    >
+      <section class="stage">
+        <div class="eyebrow" data-anim>
+          <span class="bar"></span><span class="num">03</span><span>構造</span>
+        </div>
+        <h2 class="tight" data-anim>コンポジションは、ルート1つとクリップの集合でできている</h2>
+        <div class="spacer"></div>
+        <pre class="code" data-anim>&lt;<span class="k">div</span> <span class="a">data-composition-id</span>=<span class="s">"root"</span> <span class="a">data-duration</span>=<span class="s">"10"</span>&gt;   <span class="c">← 出力の尺</span>
+  &lt;<span class="k">div</span> <span class="a">class</span>=<span class="s">"clip"</span> <span class="a">data-start</span>=<span class="s">"0"</span> <span class="a">data-duration</span>=<span class="s">"5"</span>
+       <span class="a">data-track-index</span>=<span class="s">"1"</span>&gt;タイトル&lt;/<span class="k">div</span>&gt;      <span class="c">← 表示される部品</span>
+&lt;/<span class="k">div</span>&gt;</pre>
+        <p class="lede" data-anim>
+          時間を持つ要素には
+          <span style="font-family: var(--mono); color: var(--teal)">class="clip"</span>
+          が必須です。これが無いと、フレームワークが表示・非表示を制御できません。
+        </p>
+        <div class="spacer"></div>
+      </section>
+    </div>
+
+    <!-- ===================== 04 timing ===================== -->
+    <div
+      id="scene-timing"
+      class="scene-frame clip"
+      data-composition-id="timing"
+      data-start="30"
+      data-duration="14"
+      data-track-index="1"
+      data-label="04 タイミング"
+    >
+      <section class="stage">
+        <div class="eyebrow" data-anim>
+          <span class="bar"></span><span class="num">04</span><span>タイミング</span>
+        </div>
+        <h2 data-anim>3つの data-* 属性だけで、時間軸が決まる</h2>
+        <div class="spacer"></div>
+        <div class="stack">
+          <div class="card frag" id="timing-c1">
+            <div class="name">data-start</div>
+            <div class="desc">いつ現れるか。コンポジションの先頭からの秒数で指定します。</div>
+          </div>
+          <div class="card frag" id="timing-c2">
+            <div class="name">data-duration</div>
+            <div class="desc">何秒映るか。ルートに付けたときは、出力全体の尺になります。</div>
+          </div>
+          <div class="card frag" id="timing-c3">
+            <div class="name">data-track-index</div>
+            <div class="desc">どのレイヤーに乗るか。数字が大きいほど手前に描かれます。</div>
+          </div>
+        </div>
+        <div class="spacer"></div>
+      </section>
+    </div>
+
+    <!-- ===================== 05 tracks ===================== -->
+    <div
+      id="scene-tracks"
+      class="scene-frame clip"
+      data-composition-id="tracks"
+      data-start="44"
+      data-duration="10"
+      data-track-index="1"
+      data-label="05 トラック"
+    >
+      <section class="stage">
+        <div class="eyebrow" data-anim>
+          <span class="bar"></span><span class="num">05</span><span>トラック</span>
+        </div>
+        <h2 data-anim>トラックは重なり順、クリップは表示区間を決める</h2>
+        <div class="spacer"></div>
+        <div class="stack">
+          <div class="trackrow">
+            <div class="tracklabel" data-anim>track-index 3</div>
+            <div class="lane">
+              <span
+                class="barfill"
+                data-bar
+                style="left: 52%; width: 34%; background: var(--violet)"
+              >
+                <span class="barlabel">ロゴ</span>
+              </span>
+            </div>
+          </div>
+          <div class="trackrow">
+            <div class="tracklabel" data-anim>track-index 2</div>
+            <div class="lane">
+              <span class="barfill" data-bar style="left: 14%; width: 46%; background: var(--amber)">
+                <span class="barlabel">見出しテキスト</span>
+              </span>
+            </div>
+          </div>
+          <div class="trackrow">
+            <div class="tracklabel" data-anim>track-index 1</div>
+            <div class="lane">
+              <span class="barfill" data-bar style="left: 0%; width: 100%; background: var(--teal)">
+                <span class="barlabel">背景</span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <p class="lede" data-anim>
+          同じトラックで時間が重なると z-index の解決が必要になります。重ねたい要素は、
+          別のトラックに分けるのが基本です。
+        </p>
+        <div class="spacer"></div>
+      </section>
+    </div>
+
+    <!-- ===================== 06 gsap ===================== -->
+    <div
+      id="scene-gsap"
+      class="scene-frame clip"
+      data-composition-id="gsap"
+      data-start="54"
+      data-duration="12"
+      data-track-index="1"
+      data-label="06 アニメーション"
+    >
+      <section class="stage">
+        <div class="eyebrow" data-anim>
+          <span class="bar"></span><span class="num">06</span><span>アニメーション</span>
+        </div>
+        <h2 class="tight" data-anim>
+          アニメーションは、paused な GSAP タイムライン1本に集約する
+        </h2>
+        <div class="spacer"></div>
+        <pre class="code frag" id="gsap-code"><span class="k">const</span> tl = gsap.timeline({ <span class="a">paused</span>: <span class="k">true</span> });
+tl.to(<span class="s">"#title"</span>, { <span class="a">opacity</span>: 1, <span class="a">y</span>: 0, <span class="a">duration</span>: 0.6 }, 0.5);
+<span class="k">window</span>.__timelines[<span class="s">"root"</span>] = tl;   <span class="c">← キーはルートの id</span></pre>
+        <p class="lede frag" id="gsap-note">
+          再生するのはエンジン側です。自分で
+          <span style="font-family: var(--mono); color: var(--teal)">play()</span>
+          は呼びません。タイムラインはページ読み込み時に同期的に作ること —
+          async や setTimeout の中で組むと、レンダラーが先にサンプリングしてしまいます。
+        </p>
+        <div class="spacer"></div>
+      </section>
+    </div>
+
+    <!-- ===================== 07 determinism ===================== -->
+    <div
+      id="scene-determinism"
+      class="scene-frame clip"
+      data-composition-id="determinism"
+      data-start="66"
+      data-duration="14"
+      data-track-index="1"
+      data-label="07 決定論"
+    >
+      <section class="stage">
+        <div class="eyebrow" data-anim>
+          <span class="bar"></span><span class="num">07</span><span>決定論</span>
+        </div>
+        <h2 class="tight" data-anim>
+          レンダラーは時刻を渡してフレームを取り出す。だから時計も乱数も使えない
+        </h2>
+        <div class="spacer"></div>
+        <div class="stack">
+          <div class="card warn frag" id="det-c1">
+            <div class="name">Date.now() / performance.now()</div>
+            <div class="desc">レンダー時の時計。フレームごとに違う値を返してしまいます。</div>
+          </div>
+          <div class="card warn frag" id="det-c2">
+            <div class="name">種なしの Math.random()</div>
+            <div class="desc">ばらつきが要るときは、シード付きの擬似乱数を使います。</div>
+          </div>
+          <div class="card warn frag" id="det-c3">
+            <div class="name">repeat: -1</div>
+            <div class="desc">無限ループ。尺から有限回を計算して渡します。</div>
+          </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="hint" data-anim><span>▸</span><span>なぜ？ 詳細へ</span></div>
+      </section>
+    </div>
+
+    <!-- ===================== 08 cli ===================== -->
+    <div
+      id="scene-cli"
+      class="scene-frame clip"
+      data-composition-id="cli"
+      data-start="80"
+      data-duration="14"
+      data-track-index="1"
+      data-label="08 開発フロー"
+    >
+      <section class="stage">
+        <div class="eyebrow" data-anim>
+          <span class="bar"></span><span class="num">08</span><span>開発フロー</span>
+        </div>
+        <h2 data-anim>check を通してから render する、が基本の流れ</h2>
+        <div class="spacer"></div>
+        <div class="steps">
+          <div class="step frag" id="cli-s1">
+            <div class="sn">01</div>
+            <div class="st">init</div>
+            <div class="sd">雛形を作る。解像度もここで決めます。</div>
+          </div>
+          <div class="step frag" id="cli-s2">
+            <div class="sn">02</div>
+            <div class="st">preview</div>
+            <div class="sd">ブラウザで確認しながら書く。ライブリロード付き。</div>
+          </div>
+          <div class="step accent frag" id="cli-s3">
+            <div class="sn">03</div>
+            <div class="st">check</div>
+            <div class="sd">lint・実行時・レイアウト・モーション・コントラストを一括検証。</div>
+          </div>
+          <div class="step frag" id="cli-s4">
+            <div class="sn">04</div>
+            <div class="st">render</div>
+            <div class="sd">MP4 に書き出す。publish で共有リンクも作れます。</div>
+          </div>
+        </div>
+        <div class="spacer"></div>
+      </section>
+    </div>
+
+    <!-- ===================== 09 close ===================== -->
+    <div
+      id="scene-close"
+      class="scene-frame clip"
+      data-composition-id="close"
+      data-start="94"
+      data-duration="8"
+      data-track-index="1"
+      data-label="09 おわりに"
+    >
+      <section class="stage">
+        <div class="eyebrow" data-anim>
+          <span class="bar"></span><span class="num">09</span><span>おわりに</span>
+        </div>
+        <div class="spacer"></div>
+        <h2 data-anim style="font-size: 82px">HTML が書ければ、動画が書ける</h2>
+        <p class="lede" data-anim>
+          このスライド自体も、1枚の HyperFrames コンポジションとして書かれています。
+          composition/index.html を開けば、いま見ている画面のソースがそのまま読めます。
+        </p>
+        <div class="spacer"></div>
+      </section>
+    </div>
+
+    <!-- ============ branch: determinism-detail ============ -->
+    <div
+      id="scene-det-why"
+      class="scene-frame clip"
+      data-composition-id="det-why"
+      data-start="102"
+      data-duration="8"
+      data-track-index="1"
+      data-label="分岐 決定論 なぜ"
+    >
+      <section class="stage">
+        <div class="eyebrow" data-anim>
+          <span class="bar"></span><span class="num">↳</span><span>決定論の詳細 1 / 2</span>
+        </div>
+        <h2 class="tight" data-anim>1フレームは、時刻だけから再現できなければならない</h2>
+        <p class="lede" data-anim>
+          レンダラーに「再生」という概念はありません。どのフレームも、毎回まっさらな
+          seek として描かれます。しかも並列にサンプリングされるので、順番通りに来る保証も
+          ありません。前のフレームを通ってきたことを前提にした状態は、必ず壊れます。
+        </p>
+        <div class="spacer"></div>
+      </section>
+    </div>
+
+    <div
+      id="scene-det-fix"
+      class="scene-frame clip"
+      data-composition-id="det-fix"
+      data-start="110"
+      data-duration="8"
+      data-track-index="1"
+      data-label="分岐 決定論 対処"
+    >
+      <section class="stage">
+        <div class="eyebrow" data-anim>
+          <span class="bar"></span><span class="num">↳</span><span>決定論の詳細 2 / 2</span>
+        </div>
+        <h2 class="tight" data-anim>時計や乱数は、タイムライン上のトゥイーンに置き換える</h2>
+        <div class="spacer"></div>
+        <pre class="code" data-anim><span class="c">// 無限ループは、尺から有限回を計算して渡す</span>
+<span class="a">repeat</span>: Math.max(0, Math.floor(duration / cycle) - 1)
+
+<span class="c">// ceil は data-duration を超えて lint に弾かれる</span></pre>
+        <p class="lede" data-anim>
+          setTimeout や requestAnimationFrame に手が伸びたら、それはタイムライン上の
+          トゥイーンとして書き直すべきサインです。
+        </p>
+        <div class="spacer"></div>
+      </section>
+    </div>
+
+    </div>
+    <!-- ===================== root timeline ===================== -->
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        var tl = gsap.timeline({ paused: true });
+        // 全体の尺を張る1本の seek 可能なタイムライン。
+        // 空トゥイーンは lint に弾かれるので、実体のあるオブジェクトを進める。
+        var clock = { t: 0 };
+        tl.to(clock, { t: 118, duration: 118, ease: "none" });
+        window.__timelines["root"] = tl;
+      })();
+    </script>
+
+    <!-- ============= visibility + entrance controller ============= -->
+    <script>
+      (function () {
+        var SCENES = [
+          { id: "scene-hook", start: 0, end: 8 },
+          { id: "scene-install", start: 8, end: 20 },
+          { id: "scene-anatomy", start: 20, end: 30 },
+          { id: "scene-timing", start: 30, end: 44 },
+          { id: "scene-tracks", start: 44, end: 54 },
+          { id: "scene-gsap", start: 54, end: 66 },
+          { id: "scene-determinism", start: 66, end: 80 },
+          { id: "scene-cli", start: 80, end: 94 },
+          { id: "scene-close", start: 94, end: 102 },
+          { id: "scene-det-why", start: 102, end: 110 },
+          { id: "scene-det-fix", start: 110, end: 118 },
+        ];
+
+        // 段階表示。時刻はシーン頭に寄せて、→ 連打が小気味よく効くようにする。
+        var FRAGMENTS = {
+          "scene-install": [
+            { time: 8.3, id: "install-c1" },
+            { time: 8.6, id: "install-c2" },
+            { time: 8.9, id: "install-c3" },
+          ],
+          "scene-timing": [
+            { time: 30.3, id: "timing-c1" },
+            { time: 30.6, id: "timing-c2" },
+            { time: 30.9, id: "timing-c3" },
+          ],
+          "scene-gsap": [
+            { time: 54.3, id: "gsap-code" },
+            { time: 54.6, id: "gsap-note" },
+          ],
+          "scene-determinism": [
+            { time: 66.3, id: "det-c1" },
+            { time: 66.6, id: "det-c2" },
+            { time: 66.9, id: "det-c3" },
+          ],
+          "scene-cli": [
+            { time: 80.3, id: "cli-s1" },
+            { time: 80.6, id: "cli-s2" },
+            { time: 80.9, id: "cli-s3" },
+            { time: 81.2, id: "cli-s4" },
+          ],
+        };
+
+        var staggered = {};
+
+        // 登場のずらしは一度だけ焼き込む（クラスが付いた瞬間に効く）
+        function applyStagger(sceneEl) {
+          if (staggered[sceneEl.id]) return;
+          staggered[sceneEl.id] = true;
+          var animEls = sceneEl.querySelectorAll("[data-anim]");
+          for (var i = 0; i < animEls.length; i++) {
+            animEls[i].style.transitionDelay = (i * 0.07).toFixed(2) + "s";
+          }
+          var bars = sceneEl.querySelectorAll("[data-bar]");
+          for (var b = 0; b < bars.length; b++) {
+            bars[b].style.transitionDelay = (0.15 + b * 0.12).toFixed(2) + "s";
+          }
+        }
+
+        // t だけから決まる純粋な状態更新。何度呼んでも、
+        // どの順で呼んでも同じ結果になる（前後どちらへのシークでも正しい）。
+        function updateVisibility(t) {
+          for (var i = 0; i < SCENES.length; i++) {
+            var s = SCENES[i];
+            var el = document.getElementById(s.id);
+            if (!el) continue;
+            var active = t >= s.start && t < s.end;
+            el.style.opacity = active ? "1" : "0";
+            el.style.visibility = active ? "visible" : "hidden";
+            el.style.pointerEvents = active ? "auto" : "none";
+            if (active) applyStagger(el);
+            el.classList.toggle("is-active", active);
+          }
+
+          for (var k in FRAGMENTS) {
+            var list = FRAGMENTS[k];
+            for (var f = 0; f < list.length; f++) {
+              var fel = document.getElementById(list[f].id);
+              if (fel) fel.classList.toggle("is-in", t >= list[f].time);
+            }
+          }
+        }
+
+        window.__hfSetTime = updateVisibility;
+
+        // 読み込み直後に1枚目を出す（真っ黒表示を避ける）
+        updateVisibility(0);
+
+        var root = window.__timelines && window.__timelines["root"];
+        if (root) {
+          root.eventCallback("onUpdate", function () {
+            updateVisibility(root.time());
+          });
+        }
+      })();
+    </script>
+
+    <!-- ============= scenes bootstrap postMessage =============
+         エンジン無しでホストされるため、各シーンの時間範囲は
+         コンポジション側から親フレームへ手動で通知する。
+         分岐シーンも必ず含めること（含めないと seek できない）。 -->
+    <script>
+      (function () {
+        var FPS = 30;
+        var TOTAL_SECONDS = 118;
+
+        var scenes = [
+          { id: "hook", start: 0, duration: 8 },
+          { id: "install", start: 8, duration: 12 },
+          { id: "anatomy", start: 20, duration: 10 },
+          { id: "timing", start: 30, duration: 14 },
+          { id: "tracks", start: 44, duration: 10 },
+          { id: "gsap", start: 54, duration: 12 },
+          { id: "determinism", start: 66, duration: 14 },
+          { id: "cli", start: 80, duration: 14 },
+          { id: "close", start: 94, duration: 8 },
+          { id: "det-why", start: 102, duration: 8 },
+          { id: "det-fix", start: 110, duration: 8 },
+        ];
+
+        function postTimeline() {
+          parent.postMessage(
+            {
+              source: "hf-preview",
+              type: "timeline",
+              durationInFrames: TOTAL_SECONDS * FPS,
+              scenes: scenes,
+            },
+            "*",
+          );
+        }
+
+        if (document.readyState === "complete") {
+          setTimeout(postTimeline, 300);
+        } else {
+          window.addEventListener("load", function () {
+            setTimeout(postTimeline, 300);
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Slides — HTML で書かれたスライド置き場</title>
+    <meta
+      name="description"
+      content="HyperFrames で作った、操作できるスライドデッキの一覧です。"
+    />
+    <link rel="icon" href="data:," />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --ink: #0b0e14;
+        --panel: #141b26;
+        --line: #232c3a;
+        --text: #e8edf5;
+        --muted: #9aa7bb;
+        --dim: #6b7889;
+        --teal: #4fd6c0;
+        --sans:
+          "Yu Gothic UI", "Yu Gothic", Meiryo, "Hiragino Kaku Gothic ProN", system-ui,
+          -apple-system, sans-serif;
+        --mono: Consolas, "SF Mono", "JetBrains Mono", ui-monospace, monospace;
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        min-height: 100dvh;
+        background:
+          radial-gradient(900px 520px at 82% -8%, rgba(79, 214, 192, 0.12), transparent 62%),
+          radial-gradient(760px 500px at 2% 104%, rgba(179, 157, 250, 0.1), transparent 60%),
+          var(--ink);
+        color: var(--text);
+        font-family: var(--sans);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: clamp(56px, 9vw, 128px) clamp(20px, 5vw, 40px) 72px;
+      }
+
+      /* ---------- header ---------- */
+      .eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--dim);
+      }
+      .eyebrow::before {
+        content: "";
+        width: 40px;
+        height: 2px;
+        border-radius: 2px;
+        background: var(--teal);
+      }
+
+      h1 {
+        margin-top: 22px;
+        font-size: clamp(34px, 6vw, 54px);
+        font-weight: 700;
+        line-height: 1.22;
+        letter-spacing: -0.01em;
+      }
+
+      .tagline {
+        margin-top: 8px;
+        font-size: clamp(16px, 2.4vw, 20px);
+        color: var(--teal);
+        font-weight: 600;
+      }
+
+      .lede {
+        margin-top: 22px;
+        max-width: 62ch;
+        font-size: clamp(15px, 2vw, 17px);
+        color: var(--muted);
+      }
+
+      /* ---------- grid ---------- */
+      .grid {
+        margin-top: clamp(40px, 6vw, 64px);
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+      }
+
+      .card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 30px 28px 26px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: linear-gradient(180deg, rgba(21, 28, 39, 0.9), rgba(15, 20, 29, 0.9));
+        color: inherit;
+        text-decoration: none;
+        overflow: hidden;
+        transition:
+          transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+          border-color 0.22s ease,
+          box-shadow 0.22s ease;
+      }
+      .card:hover,
+      .card:focus-visible {
+        transform: translateY(-4px);
+        border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+        box-shadow: 0 18px 44px -22px rgba(0, 0, 0, 0.9);
+      }
+      .card:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+      }
+
+      .card-rule {
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent), transparent 78%);
+      }
+
+      .card-sub {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        color: var(--accent);
+      }
+
+      .card-title {
+        font-size: 25px;
+        font-weight: 700;
+        line-height: 1.3;
+      }
+
+      .card-desc {
+        font-size: 15px;
+        color: var(--muted);
+      }
+
+      .card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 4px;
+        list-style: none;
+      }
+      .card-tags li {
+        padding: 3px 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        font-size: 12px;
+        color: var(--dim);
+      }
+
+      .card-meta {
+        margin-top: 8px;
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--dim);
+      }
+
+      .card-cta {
+        margin-top: 14px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--accent);
+      }
+      .card-cta span {
+        display: inline-block;
+        transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .card:hover .card-cta span {
+        transform: translateX(5px);
+      }
+
+      /* ---------- footer ---------- */
+      footer {
+        margin-top: clamp(56px, 8vw, 88px);
+        padding-top: 26px;
+        border-top: 1px solid var(--line);
+        font-size: 13.5px;
+        color: var(--dim);
+      }
+      footer p + p {
+        margin-top: 8px;
+      }
+      kbd {
+        display: inline-block;
+        padding: 1px 7px;
+        border: 1px solid var(--line);
+        border-bottom-width: 2px;
+        border-radius: 6px;
+        background: var(--panel);
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+      }
+      footer a {
+        color: var(--muted);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      footer a:hover {
+        color: var(--text);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition-duration: 0.01ms !important;
+        }
+        .card:hover,
+        .card:focus-visible {
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <header>
+        <p class="eyebrow">Slides</p>
+        <h1>HTML で書かれたスライド置き場</h1>
+        <p class="tagline">HyperFrames &mdash; HTML is a video format</p>
+        <p class="lede">
+          スライドはすべて 1 枚の HTML コンポジションとして書かれています。ブラウザで開いて
+          矢印キーで進めるだけで、段階表示もホットスポットからの分岐もそのまま動きます。
+        </p>
+      </header>
+
+      <div class="grid">
+        <!-- decks:start -->
+        <a class="card" href="/decks/hyperframes-guide/" style="--accent: #4fd6c0">
+          <span class="card-rule" aria-hidden="true"></span>
+          <p class="card-sub">HTML から動画を書く</p>
+          <h2 class="card-title">HyperFrames 入門</h2>
+          <p class="card-desc">コンポジションの構造、data-* によるタイミング指定、GSAP タイムライン、決定論ルール、CLI の開発フローまで。実装者がそのまま手を動かせる粒度で解説します。</p>
+          <ul class="card-tags">
+            <li>実装者向け</li>
+            <li>日本語</li>
+          </ul>
+          <p class="card-meta">9 スライド · 15 段階表示 · 分岐 2 枚</p>
+          <span class="card-cta">開く <span aria-hidden="true">→</span></span>
+        </a>
+        <!-- decks:end -->
+      </div>
+
+      <footer>
+        <p>
+          操作 &mdash; <kbd>&larr;</kbd> <kbd>&rarr;</kbd> でスライドと段階表示を移動、
+          <kbd>P</kbd> で発表者モード（別タブに聴衆用ビューが開きます）。
+        </p>
+        <p>
+          Built with
+          <a href="https://github.com/heygen-com/hyperframes" rel="noreferrer noopener"
+            >HyperFrames</a
+          >.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

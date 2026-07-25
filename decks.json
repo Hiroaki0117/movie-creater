@@ -1,0 +1,18 @@
+{
+  "site": {
+    "title": "Slides",
+    "tagline": "HTML で書かれたスライド置き場",
+    "description": "HyperFrames で作った、操作できるスライドデッキの一覧です。矢印キーで進み、段階表示や分岐もそのまま動きます。"
+  },
+  "decks": [
+    {
+      "id": "hyperframes-guide",
+      "title": "HyperFrames 入門",
+      "subtitle": "HTML から動画を書く",
+      "description": "コンポジションの構造、data-* によるタイミング指定、GSAP タイムライン、決定論ルール、CLI の開発フローまで。実装者がそのまま手を動かせる粒度で解説します。",
+      "composition": "/composition/index.html",
+      "accent": "#4fd6c0",
+      "tags": ["実装者向け", "日本語"]
+    }
+  ]
+}

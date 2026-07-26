@@ -2,7 +2,7 @@
   "site": {
     "title": "Slides",
     "tagline": "HTML で書かれたスライド置き場",
-    "description": "HyperFrames で作った、操作できるスライドデッキの一覧です。矢印キーで進み、段階表示や分岐もそのまま動きます。"
+    "description": "HyperFrames で作った、操作できるスライドデッキと解説動画の一覧です。"
   },
   "decks": [
     {
@@ -13,6 +13,20 @@
       "composition": "/composition/index.html",
       "accent": "#4fd6c0",
       "tags": ["実装者向け", "日本語"]
+    }
+  ],
+  "videos": [
+    {
+      "id": "hyperframes-skills-tour",
+      "title": "スキルの使い方と、作れるもの",
+      "subtitle": "一言から MP4 が出るまで",
+      "description": "前半で「/hyperframes に一言投げてから MP4 が出るまで」の流れを1本追い、後半で入力の種類ごとに何が作れるのかを一覧します。内部仕様ではなく、使う側から見た HyperFrames。",
+      "project": "videos/hyperframes-skills-tour",
+      "src": "/media/hyperframes-skills-tour.mp4",
+      "poster": "/media/hyperframes-skills-tour-poster.png",
+      "note": "ナレーションなし。画面のタイポグラフィと図で読ませる構成です。",
+      "accent": "#cc785c",
+      "tags": ["解説動画", "日本語", "無音"]
     }
   ]
 }

@@ -1,0 +1,129 @@
+<template>
+  <style>
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+    }
+
+    /* 日本語は preset の EB Garamond / Inter / JetBrains Mono が
+       いずれもカバーしないため、コンパイラの対応表にある Noto Sans JP を使う。
+       Latin の索引レイヤー（kicker・ファイル名・コード）だけ JetBrains Mono を保つ。 */
+    .hook-bg {
+      position: absolute;
+      inset: 0;
+      background-color: #faf9f5;
+    }
+    .hook-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(20, 20, 19, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(20, 20, 19, 0.05) 1px, transparent 1px);
+      background-size: 96px 96px;
+    }
+
+    .hook-stage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 160px 184px;
+    }
+
+    .hook-spike {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 58px;
+      font-weight: 500;
+      line-height: 1;
+      color: #cc785c;
+      margin-bottom: 40px;
+    }
+
+    .hook-line {
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 118px;
+      font-weight: 700;
+      line-height: 1.24;
+      letter-spacing: -0.015em;
+      color: #141413;
+      white-space: nowrap;
+    }
+    .hook-line span {
+      display: inline-block;
+    }
+    .hook-line-2 {
+      margin-top: 10px;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="01-hook"
+    data-start="0"
+    data-duration="6.5"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div
+      class="clip hook-bg"
+      id="f01-hook-bg"
+      data-start="0"
+      data-duration="6.5"
+      data-track-index="1"
+    >
+      <div class="hook-grid" id="f01-hook-grid"></div>
+    </div>
+
+    <div
+      class="clip hook-stage"
+      id="f01-hook-stage"
+      data-start="0"
+      data-duration="6.5"
+      data-track-index="2"
+    >
+      <div class="hook-spike" id="f01-hook-spike">✱</div>
+      <div class="hook-line" id="f01-hook-l1">
+        <span>一言、</span><span>投げる</span><span>だけ。</span>
+      </div>
+      <div class="hook-line hook-line-2" id="f01-hook-l2">
+        <span>動画が</span><span>返って</span><span>くる。</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      // Scene 1 (0.0–1.6s) — 1行目が語ごとに入る
+      tl.fromTo(
+        "#f01-hook-l1 span",
+        { opacity: 0, y: 34 },
+        { opacity: 1, y: 0, duration: 0.7, stagger: 0.13, ease: "power3.out" },
+        0.15,
+      );
+
+      // Scene 2 (1.6–3.4s) — 2行目が続き、✱ が灯る
+      tl.fromTo(
+        "#f01-hook-l2 span",
+        { opacity: 0, y: 34 },
+        { opacity: 1, y: 0, duration: 0.7, stagger: 0.13, ease: "power3.out" },
+        1.7,
+      );
+      tl.fromTo(
+        "#f01-hook-spike",
+        { opacity: 0, scale: 0.92 },
+        { opacity: 1, scale: 1, duration: 0.6, ease: "power3.out" },
+        2.7,
+      );
+
+      // Scene 3 (3.4–6.0s) — 完全静止。カメラは動かさない。
+      window.__timelines["01-hook"] = tl;
+    })();
+  </script>
+</template>

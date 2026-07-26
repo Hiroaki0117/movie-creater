@@ -1,0 +1,139 @@
+<template>
+  <style>
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+    }
+    .ca-bg {
+      position: absolute;
+      inset: 0;
+      background-color: #faf9f5;
+    }
+    .ca-stage {
+      position: absolute;
+      inset: 0;
+      padding: 84px 128px 184px;
+      display: flex;
+      flex-direction: column;
+    }
+    .ca-kicker {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 30px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      color: #6f6b64;
+    }
+    .ca-kicker b {
+      color: #cc785c;
+      font-weight: 500;
+      margin-right: 14px;
+    }
+    .ca-head {
+      margin-top: 20px;
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 72px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+      color: #141413;
+    }
+    .ca-grid {
+      flex: 1;
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 24px;
+    }
+    .ca-card {
+      padding: 34px 38px;
+      background: #efe9de;
+      border: 1px solid rgba(20, 20, 19, 0.12);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 16px;
+    }
+    .ca-name {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 38px;
+      font-weight: 500;
+      color: #141413;
+    }
+    .ca-desc {
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 30px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #4a463f;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="08-catalog-a"
+    data-start="0"
+    data-duration="12"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div class="clip ca-bg" id="f08-catalog-a-bg" data-start="0" data-duration="12" data-track-index="1"></div>
+
+    <div
+      class="clip ca-stage"
+      id="f08-catalog-a-stage"
+      data-start="0"
+      data-duration="12"
+      data-track-index="2"
+    >
+      <div class="ca-kicker" id="f08-catalog-a-kicker"><b>✱</b>WHAT YOU CAN MAKE</div>
+      <div class="ca-head" id="f08-catalog-a-head">では、何が作れるのか。</div>
+
+      <div class="ca-grid">
+        <div class="ca-card" id="f08-catalog-a-c1">
+          <div class="ca-name">product-launch-video</div>
+          <div class="ca-desc">製品サイトの URL から、製品紹介の動画。</div>
+        </div>
+        <div class="ca-card" id="f08-catalog-a-c2">
+          <div class="ca-name">faceless-explainer</div>
+          <div class="ca-desc">記事・メモ・お題から、解説動画。素材ゼロで成立する。</div>
+        </div>
+        <div class="ca-card" id="f08-catalog-a-c3">
+          <div class="ca-name">pr-to-video</div>
+          <div class="ca-desc">GitHub の PR から、コード変更の解説動画。</div>
+        </div>
+        <div class="ca-card" id="f08-catalog-a-c4">
+          <div class="ca-name">motion-graphics</div>
+          <div class="ca-desc">10 秒前後。ロゴ、数字のカウントアップ、字幕オーバーレイ。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      tl.fromTo("#f08-catalog-a-kicker", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
+      tl.fromTo("#f08-catalog-a-head", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.5);
+
+      // Scene 2 (1.6–8.0s) — 拍ごとに1枚ずつ着地
+      var starts = [1.7, 3.2, 4.7, 6.2];
+      for (var i = 0; i < 4; i++) {
+        tl.fromTo(
+          "#f08-catalog-a-c" + (i + 1),
+          { opacity: 0, y: 34 },
+          { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" },
+          starts[i],
+        );
+      }
+
+      // Scene 3 (8.0–12.0s) — 静止して読ませる
+      window.__timelines["08-catalog-a"] = tl;
+    })();
+  </script>
+</template>

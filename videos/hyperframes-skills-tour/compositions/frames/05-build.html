@@ -1,0 +1,156 @@
+<template>
+  <style>
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+    }
+    .bd-bg {
+      position: absolute;
+      inset: 0;
+      background-color: #faf9f5;
+    }
+    .bd-stage {
+      position: absolute;
+      inset: 0;
+      padding: 88px 128px 184px;
+      display: flex;
+      flex-direction: column;
+    }
+    .bd-kicker {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 30px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      color: #6f6b64;
+    }
+    .bd-kicker b {
+      color: #cc785c;
+      font-weight: 500;
+      margin-right: 14px;
+    }
+    .bd-head {
+      margin-top: 22px;
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 78px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+      color: #141413;
+    }
+    .bd-mid {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 44px;
+    }
+    .bd-card {
+      align-self: flex-start;
+      padding: 26px 44px;
+      background: #efe9de;
+      border: 1px solid rgba(20, 20, 19, 0.12);
+      border-radius: 10px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 40px;
+      font-weight: 500;
+      color: #141413;
+    }
+    /* 10枚を1列に並べると1枚あたり ~150px になり、
+       ファイル名が読めなくなる。5列×2段にして可読サイズを確保する。 */
+    .bd-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+    .bd-tile {
+      min-width: 0;
+      height: 118px;
+      padding: 18px 22px;
+      background: #efe9de;
+      border: 1px solid rgba(20, 20, 19, 0.12);
+      border-radius: 8px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 27px;
+      font-weight: 500;
+      color: #4a463f;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+    .bd-note {
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 34px;
+      font-weight: 500;
+      color: #6f6b64;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="05-build"
+    data-start="0"
+    data-duration="9.5"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div class="clip bd-bg" id="f05-build-bg" data-start="0" data-duration="9.5" data-track-index="1"></div>
+
+    <div
+      class="clip bd-stage"
+      id="f05-build-stage"
+      data-start="0"
+      data-duration="9.5"
+      data-track-index="2"
+    >
+      <div class="bd-kicker" id="f05-build-kicker"><b>✱</b>STEP 04—05</div>
+      <div class="bd-head" id="f05-build-head">シーンに割って、1枚ずつ組む。</div>
+
+      <div class="bd-mid">
+        <div class="bd-card" id="f05-build-card">STORYBOARD.md</div>
+        <div class="bd-strip">
+          <div class="bd-tile" id="f05-build-t1">01-hook</div>
+          <div class="bd-tile" id="f05-build-t2">02-entry</div>
+          <div class="bd-tile" id="f05-build-t3">03-brief</div>
+          <div class="bd-tile" id="f05-build-t4">04-route</div>
+          <div class="bd-tile" id="f05-build-t5">05-build</div>
+          <div class="bd-tile" id="f05-build-t6">06-check</div>
+          <div class="bd-tile" id="f05-build-t7">07-render</div>
+          <div class="bd-tile" id="f05-build-t8">08-catalog</div>
+          <div class="bd-tile" id="f05-build-t9">09-catalog</div>
+          <div class="bd-tile" id="f05-build-t10">10-close</div>
+        </div>
+        <div class="bd-note" id="f05-build-note">1 シーン = 1 ファイルの HTML</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      tl.fromTo("#f05-build-kicker", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
+      tl.fromTo("#f05-build-head", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.35);
+
+      // Scene 2 (1.4–3.0s)
+      tl.fromTo("#f05-build-card", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 1.5);
+
+      // Scene 3 (3.0–6.8s) — タイルが左から順に着地
+      var tiles = [];
+      for (var i = 1; i <= 10; i++) tiles.push("#f05-build-t" + i);
+      tl.fromTo(
+        tiles,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.33, ease: "power3.out" },
+        3.1,
+      );
+
+      // Scene 4 (6.8–9.0s)
+      tl.fromTo("#f05-build-note", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, 6.9);
+
+      window.__timelines["05-build"] = tl;
+    })();
+  </script>
+</template>

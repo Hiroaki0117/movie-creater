@@ -1,0 +1,176 @@
+<template>
+  <style>
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+    }
+    .br-bg {
+      position: absolute;
+      inset: 0;
+      background-color: #faf9f5;
+    }
+    .br-stage {
+      position: absolute;
+      inset: 0;
+      padding: 88px 128px 184px;
+      display: flex;
+      flex-direction: column;
+    }
+    .br-kicker {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 30px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      color: #6f6b64;
+    }
+    .br-kicker b {
+      color: #cc785c;
+      font-weight: 500;
+      margin-right: 14px;
+    }
+    .br-head {
+      margin-top: 22px;
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 74px;
+      font-weight: 700;
+      line-height: 1.22;
+      letter-spacing: -0.015em;
+      color: #141413;
+    }
+    .br-cols {
+      flex: 1;
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: 42% 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+    .br-q {
+      padding: 28px 0;
+      border-top: 1px solid rgba(20, 20, 19, 0.14);
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 42px;
+      font-weight: 500;
+      color: #3a3730;
+    }
+    .br-q:last-child {
+      border-bottom: 1px solid rgba(20, 20, 19, 0.14);
+    }
+
+    .br-code {
+      background: #181715;
+      border: 1px solid rgba(250, 249, 245, 0.14);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .br-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 28px;
+      background: #252320;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 26px;
+      font-weight: 500;
+      color: #d8d3c8;
+    }
+    .br-bar b {
+      color: #cc785c;
+      font-weight: 500;
+    }
+    .br-body {
+      padding: 30px 34px 36px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 30px;
+      line-height: 1.72;
+      color: #faf9f5;
+    }
+    .br-body div {
+      white-space: nowrap;
+    }
+    .br-k {
+      color: #a8a196;
+    }
+    .br-v {
+      color: #5db8a6;
+    }
+    .br-note {
+      margin-top: 34px;
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 36px;
+      font-weight: 500;
+      color: #6f6b64;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="03-brief"
+    data-start="0"
+    data-duration="10.5"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div class="clip br-bg" id="f03-brief-bg" data-start="0" data-duration="10.5" data-track-index="1"></div>
+
+    <div
+      class="clip br-stage"
+      id="f03-brief-stage"
+      data-start="0"
+      data-duration="10.5"
+      data-track-index="2"
+    >
+      <div class="br-kicker" id="f03-brief-kicker"><b>✱</b>STEP 01—02</div>
+      <div class="br-head" id="f03-brief-head">聞かれて、1枚のファイルになる。</div>
+
+      <div class="br-cols">
+        <div>
+          <div class="br-q" id="f03-brief-q1">何を伝える動画か</div>
+          <div class="br-q" id="f03-brief-q2">どこに置くか</div>
+          <div class="br-q" id="f03-brief-q3">どのくらいの長さか</div>
+          <div class="br-note" id="f03-brief-note">以降、同じことは二度聞かれない。</div>
+        </div>
+
+        <div class="br-code" id="f03-brief-code">
+          <div class="br-bar"><b>✱</b>BRIEF.md</div>
+          <div class="br-body">
+            <div id="f03-brief-c1"><span class="br-k">workflow:</span> <span class="br-v">faceless-explainer</span></div>
+            <div id="f03-brief-c2"><span class="br-k">message:</span> <span class="br-v">"..."</span></div>
+            <div id="f03-brief-c3"><span class="br-k">aspect:</span> <span class="br-v">1920x1080</span></div>
+            <div id="f03-brief-c4"><span class="br-k">length:</span> <span class="br-v">89s</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      // Scene 1 (0.0–1.2s)
+      tl.fromTo("#f03-brief-kicker", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
+      tl.fromTo("#f03-brief-head", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.35);
+
+      // Scene 2 (1.2–4.2s) — 問いが拍ごとに1つずつ
+      tl.fromTo("#f03-brief-q1", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.65, ease: "power3.out" }, 1.3);
+      tl.fromTo("#f03-brief-q2", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.65, ease: "power3.out" }, 2.2);
+      tl.fromTo("#f03-brief-q3", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.65, ease: "power3.out" }, 3.1);
+
+      // Scene 3 (4.2–7.4s) — コード面が立ち上がり、1行ずつ書かれる
+      tl.fromTo("#f03-brief-code", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 4.3);
+      tl.fromTo("#f03-brief-c1", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 5.3);
+      tl.fromTo("#f03-brief-c2", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 5.8);
+      tl.fromTo("#f03-brief-c3", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 6.3);
+      tl.fromTo("#f03-brief-c4", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.out" }, 6.8);
+
+      // Scene 4 (7.4–10.0s)
+      tl.fromTo("#f03-brief-note", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 7.5);
+
+      window.__timelines["03-brief"] = tl;
+    })();
+  </script>
+</template>

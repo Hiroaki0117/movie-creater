@@ -1,0 +1,156 @@
+<template>
+  <style>
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+    }
+    .rt-bg {
+      position: absolute;
+      inset: 0;
+      background-color: #faf9f5;
+    }
+    .rt-stage {
+      position: absolute;
+      inset: 0;
+      padding: 88px 128px 184px;
+      display: flex;
+      flex-direction: column;
+    }
+    .rt-kicker {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 30px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      color: #6f6b64;
+    }
+    .rt-kicker b {
+      color: #cc785c;
+      font-weight: 500;
+      margin-right: 14px;
+    }
+    .rt-head {
+      margin-top: 22px;
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 82px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+      color: #141413;
+    }
+    /* 帯は行と同じ箱に持たせる。別レイヤーの絶対配置だと行とズレる。 */
+    .rt-map {
+      flex: 1;
+      margin-top: 48px;
+      padding: 52px 56px;
+      background: #efe9de;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 30px;
+    }
+    .rt-row {
+      display: grid;
+      grid-template-columns: 360px 1fr 560px;
+      align-items: center;
+      gap: 28px;
+    }
+    .rt-in {
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 42px;
+      font-weight: 700;
+      color: #141413;
+      text-align: right;
+    }
+    .rt-wire {
+      position: relative;
+      height: 1px;
+      background: rgba(20, 20, 19, 0.2);
+      transform-origin: left center;
+    }
+    .rt-out {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 40px;
+      font-weight: 500;
+      color: #3a3730;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="04-route"
+    data-start="0"
+    data-duration="10.5"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div class="clip rt-bg" id="f04-route-bg" data-start="0" data-duration="10.5" data-track-index="1">
+    </div>
+
+    <div
+      class="clip rt-stage"
+      id="f04-route-stage"
+      data-start="0"
+      data-duration="10.5"
+      data-track-index="2"
+    >
+      <div class="rt-kicker" id="f04-route-kicker"><b>✱</b>STEP 03</div>
+      <div class="rt-head" id="f04-route-head">入力の種類が、出力を決める。</div>
+
+      <div class="rt-map">
+        <div class="rt-row">
+          <div class="rt-in" id="f04-route-i1">URL</div>
+          <div class="rt-wire" id="f04-route-w1"></div>
+          <div class="rt-out" id="f04-route-o1">product-launch-video</div>
+        </div>
+        <div class="rt-row">
+          <div class="rt-in" id="f04-route-i2">テキスト</div>
+          <div class="rt-wire" id="f04-route-w2"></div>
+          <div class="rt-out" id="f04-route-o2">faceless-explainer</div>
+        </div>
+        <div class="rt-row">
+          <div class="rt-in" id="f04-route-i3">GitHub の PR</div>
+          <div class="rt-wire" id="f04-route-w3"></div>
+          <div class="rt-out" id="f04-route-o3">pr-to-video</div>
+        </div>
+        <div class="rt-row">
+          <div class="rt-in" id="f04-route-i4">音源</div>
+          <div class="rt-wire" id="f04-route-w4"></div>
+          <div class="rt-out" id="f04-route-o4">music-to-video</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      tl.fromTo("#f04-route-kicker", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
+      tl.fromTo("#f04-route-head", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.35);
+
+      // Scene 2 (1.2–6.6s) — 入力 → 線が引かれる → 出力、を4回
+      var starts = [1.3, 2.6, 3.9, 5.2];
+      for (var i = 0; i < 4; i++) {
+        var n = i + 1;
+        var t = starts[i];
+        tl.fromTo("#f04-route-i" + n, { opacity: 0, x: -34 }, { opacity: 1, x: 0, duration: 0.55, ease: "power3.out" }, t);
+        tl.fromTo("#f04-route-w" + n, { scaleX: 0 }, { scaleX: 1, duration: 0.65, ease: "power3.out" }, t + 0.3);
+        tl.fromTo("#f04-route-o" + n, { opacity: 0, x: 26 }, { opacity: 1, x: 0, duration: 0.55, ease: "power3.out" }, t + 0.75);
+      }
+
+      // Scene 3 (6.6–8.4s) — 線全体が一度だけ締まる
+      tl.to(
+        ["#f04-route-w1", "#f04-route-w2", "#f04-route-w3", "#f04-route-w4"],
+        { backgroundColor: "rgba(20,20,19,0.34)", duration: 0.7, ease: "power2.out" },
+        6.7,
+      );
+
+      // Scene 4 (8.4–10.0s) — 静止
+      window.__timelines["04-route"] = tl;
+    })();
+  </script>
+</template>

@@ -12,6 +12,8 @@ out/
 renders/
 .media/
 .hyperframes-cache/
+# 検証用に撮り直せるので追跡しない（配信に使うポスターは media/ に置く）
+snapshots/
 
 # --- OS / エディタ ---
 Thumbs.db

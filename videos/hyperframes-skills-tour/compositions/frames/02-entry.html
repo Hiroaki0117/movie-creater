@@ -1,0 +1,172 @@
+<template>
+  <style>
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+    }
+    .en-bg {
+      position: absolute;
+      inset: 0;
+      background-color: #faf9f5;
+    }
+    .en-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(20, 20, 19, 0.045) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(20, 20, 19, 0.045) 1px, transparent 1px);
+      background-size: 96px 96px;
+    }
+    .en-stage {
+      position: absolute;
+      inset: 0;
+      padding: 92px 128px 184px;
+      display: flex;
+      flex-direction: column;
+    }
+    .en-kicker {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 30px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      color: #6f6b64;
+    }
+    .en-kicker b {
+      color: #cc785c;
+      font-weight: 500;
+      margin-right: 14px;
+    }
+    .en-head {
+      margin-top: 26px;
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 92px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+      color: #141413;
+    }
+    .en-mid {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .en-card {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      padding: 44px 72px;
+      background: #efe9de;
+      border: 1px solid rgba(20, 20, 19, 0.12);
+      border-radius: 12px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 72px;
+      font-weight: 500;
+      color: #141413;
+    }
+    .en-row {
+      display: flex;
+      justify-content: center;
+      gap: 22px;
+    }
+    .en-frag {
+      padding: 22px 34px;
+      background: #faf9f5;
+      border: 1px solid rgba(20, 20, 19, 0.12);
+      border-radius: 9999px;
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 34px;
+      font-weight: 500;
+      color: #4a463f;
+      white-space: nowrap;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="02-entry"
+    data-start="0"
+    data-duration="7.5"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div class="clip en-bg" id="f02-entry-bg" data-start="0" data-duration="7.5" data-track-index="1">
+      <div class="en-grid"></div>
+    </div>
+
+    <div
+      class="clip en-stage"
+      id="f02-entry-stage"
+      data-start="0"
+      data-duration="7.5"
+      data-track-index="2"
+    >
+      <div class="en-kicker" id="f02-entry-kicker"><b>✱</b>ENTRY POINT</div>
+      <div class="en-head" id="f02-entry-head">入口は、ひとつ。</div>
+
+      <div class="en-mid">
+        <div class="en-card" id="f02-entry-card">/hyperframes</div>
+      </div>
+
+      <div class="en-row">
+        <div class="en-frag" id="f02-entry-f1">動画を作りたい</div>
+        <div class="en-frag" id="f02-entry-f2">このデッキを直して</div>
+        <div class="en-frag" id="f02-entry-f3">PR を解説したい</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      // Scene 1 (0.0–1.4s)
+      tl.fromTo(
+        "#f02-entry-kicker",
+        { opacity: 0, y: 18 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" },
+        0.1,
+      );
+      tl.fromTo(
+        "#f02-entry-head",
+        { opacity: 0, y: 34 },
+        { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
+        0.4,
+      );
+
+      // Scene 2 (1.4–3.6s) — 中央のカードが据わる
+      tl.fromTo(
+        "#f02-entry-card",
+        { opacity: 0, scale: 0.94 },
+        { opacity: 1, scale: 1, duration: 0.9, ease: "power3.out" },
+        1.5,
+      );
+
+      // Scene 3 (3.6–5.6s) — 依頼の断片が拍ごとに寄る
+      tl.fromTo(
+        "#f02-entry-f1",
+        { opacity: 0, x: -70 },
+        { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" },
+        3.6,
+      );
+      tl.fromTo(
+        "#f02-entry-f3",
+        { opacity: 0, x: 70 },
+        { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" },
+        4.2,
+      );
+      tl.fromTo(
+        "#f02-entry-f2",
+        { opacity: 0, y: 46 },
+        { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" },
+        4.8,
+      );
+
+      // Scene 4 (5.6–7.0s) — 静止
+      window.__timelines["02-entry"] = tl;
+    })();
+  </script>
+</template>

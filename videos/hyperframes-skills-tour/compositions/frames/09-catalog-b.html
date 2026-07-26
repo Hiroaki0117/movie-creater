@@ -1,0 +1,139 @@
+<template>
+  <style>
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+    }
+    .cb-bg {
+      position: absolute;
+      inset: 0;
+      background-color: #faf9f5;
+    }
+    .cb-stage {
+      position: absolute;
+      inset: 0;
+      padding: 96px 128px 184px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+    }
+    .cb-band {
+      position: relative;
+      display: grid;
+      grid-template-columns: 460px 1fr;
+      align-items: center;
+      gap: 40px;
+      padding: 26px 34px;
+      background: #efe9de;
+      border: 1px solid rgba(20, 20, 19, 0.1);
+      border-radius: 10px;
+    }
+    .cb-name {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 36px;
+      font-weight: 500;
+      color: #141413;
+    }
+    .cb-desc {
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 31px;
+      font-weight: 400;
+      color: #4a463f;
+    }
+    .cb-edge {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      border-radius: 0 10px 10px 0;
+      background: #cc785c;
+      transform-origin: center top;
+    }
+    .cb-aside {
+      margin-top: 10px;
+      padding-left: 34px;
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 30px;
+      font-weight: 500;
+      color: #a4623f;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="09-catalog-b"
+    data-start="0"
+    data-duration="12.5"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div class="clip cb-bg" id="f09-catalog-b-bg" data-start="0" data-duration="12.5" data-track-index="1"></div>
+
+    <div
+      class="clip cb-stage"
+      id="f09-catalog-b-stage"
+      data-start="0"
+      data-duration="12.5"
+      data-track-index="2"
+    >
+      <div class="cb-band" id="f09-catalog-b-b1">
+        <div class="cb-name">slideshow</div>
+        <div class="cb-desc">プレゼン・ピッチデッキ。段階表示と分岐、発表者モード。</div>
+        <div class="cb-edge" id="f09-catalog-b-edge"></div>
+      </div>
+      <div class="cb-aside" id="f09-catalog-b-aside">
+        これだけ、出力は MP4 ではなく操作できるデッキ。
+      </div>
+      <div class="cb-band" id="f09-catalog-b-b2">
+        <div class="cb-name">music-to-video</div>
+        <div class="cb-desc">音源から、ビート同期の映像。</div>
+      </div>
+      <div class="cb-band" id="f09-catalog-b-b3">
+        <div class="cb-name">embedded-captions</div>
+        <div class="cb-desc">既存の映像に字幕を載せる。映像そのものは無加工。</div>
+      </div>
+      <div class="cb-band" id="f09-catalog-b-b4">
+        <div class="cb-name">talking-head-recut</div>
+        <div class="cb-desc">既存の映像に、情報カードやローワーサードを重ねる。</div>
+      </div>
+      <div class="cb-band" id="f09-catalog-b-b5">
+        <div class="cb-name">general-video</div>
+        <div class="cb-desc">上記以外すべて。長尺、モンタージュ、共同編集モード。</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      // Scene 2 (0.8–7.2s) — 帯が上から1本ずつ積まれる
+      var starts = [0.2, 1.5, 2.8, 4.1, 5.4];
+      for (var i = 0; i < 5; i++) {
+        tl.fromTo(
+          "#f09-catalog-b-b" + (i + 1),
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" },
+          starts[i],
+        );
+      }
+
+      // Scene 3 (7.2–9.4s) — slideshow だけ coral の縁が灯り、但し書きが添う
+      tl.fromTo("#f09-catalog-b-edge", { scaleY: 0 }, { scaleY: 1, duration: 0.7, ease: "power3.out" }, 7.3);
+      tl.fromTo(
+        "#f09-catalog-b-aside",
+        { opacity: 0, x: -24 },
+        { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" },
+        7.8,
+      );
+
+      // Scene 4 (9.4–12.0s) — 静止
+      window.__timelines["09-catalog-b"] = tl;
+    })();
+  </script>
+</template>

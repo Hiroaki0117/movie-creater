@@ -1,0 +1,116 @@
+<template>
+  <style>
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+    }
+    .cl-bg {
+      position: absolute;
+      inset: 0;
+      background-color: #faf9f5;
+    }
+    .cl-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(20, 20, 19, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(20, 20, 19, 0.05) 1px, transparent 1px);
+      background-size: 96px 96px;
+    }
+    .cl-stage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 160px 184px;
+    }
+    .cl-line {
+      font-family: "Noto Sans JP", sans-serif;
+      font-size: 96px;
+      font-weight: 700;
+      line-height: 1.26;
+      letter-spacing: -0.015em;
+      color: #141413;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .cl-line span {
+      display: inline-block;
+    }
+    .cl-sub {
+      margin-top: 46px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 44px;
+      font-weight: 500;
+      color: #6f6b64;
+    }
+    .cl-spike {
+      margin-top: 56px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 66px;
+      font-weight: 500;
+      color: #cc785c;
+      line-height: 1;
+    }
+  </style>
+
+  <div
+    id="root"
+    data-composition-id="10-close"
+    data-start="0"
+    data-duration="8"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div class="clip cl-bg" id="f10-close-bg" data-start="0" data-duration="8" data-track-index="1">
+      <div class="cl-grid"></div>
+    </div>
+
+    <div
+      class="clip cl-stage"
+      id="f10-close-stage"
+      data-start="0"
+      data-duration="8"
+      data-track-index="2"
+    >
+      <div class="cl-line" id="f10-close-line">
+        <span>この動画も、</span><span>テキストを</span><span>一つ渡しただけ。</span>
+      </div>
+      <div class="cl-sub" id="f10-close-sub">faceless-explainer</div>
+      <div class="cl-spike" id="f10-close-spike">✱</div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      // Scene 1 (0.0–1.8s)
+      tl.fromTo(
+        "#f10-close-line span",
+        { opacity: 0, y: 32 },
+        { opacity: 1, y: 0, duration: 0.75, stagger: 0.16, ease: "power3.out" },
+        0.15,
+      );
+
+      // Scene 2 (1.8–3.4s)
+      tl.fromTo("#f10-close-sub", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 1.9);
+
+      // Scene 3 (3.4–4.6s) — ✱ が灯って止まる
+      tl.fromTo(
+        "#f10-close-spike",
+        { opacity: 0, scale: 0.92 },
+        { opacity: 1, scale: 1, duration: 0.8, ease: "power3.out" },
+        3.5,
+      );
+
+      // Scene 4 (4.6–8.0s) — 完全静止
+      window.__timelines["10-close"] = tl;
+    })();
+  </script>
+</template>

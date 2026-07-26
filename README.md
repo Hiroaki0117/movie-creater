@@ -1,7 +1,12 @@
 # Slides
 
-HyperFrames で書いた、操作できるスライドデッキ置き場。
-トップページからデッキを選んで開く構成で、Vercel に静的デプロイできます。
+HyperFrames で作った、操作できるスライドデッキと解説動画の置き場。
+トップページから選んで開く構成で、Vercel に静的デプロイできます。
+
+| 種類   | 中身                                                                 |
+| ------ | -------------------------------------------------------------------- |
+| Decks  | `slideshow` ワークフロー。矢印キーで進む HTML デッキ（MP4 ではない） |
+| Videos | `faceless-explainer` ワークフロー。書き出した MP4                    |
 
 ## 動かす
 
@@ -45,6 +50,31 @@ npm run dev
 デプロイ後の表示が他所のホストの生死に左右されることはありません。
 
 `.vercelignore` で `.agents/` や制作用メタデータ（`BRIEF.md` など）は配信対象から外しています。
+
+## 収録している解説動画
+
+`videos/hyperframes-skills-tour/` — 「スキルの使い方と、作れるもの」（89秒 / 10シーン / 無音）。
+
+前半で `/hyperframes` に一言投げてから MP4 が出るまでの流れを追い、後半で入力の種類ごとに
+何が作れるのかを一覧します。デザインは `code-editorial` プリセット。
+
+**ナレーションはありません。** ローカルの Kokoro TTS は日本語を音素化できず
+（espeak-ng が日本語非対応で、Unicode 文字名を英語で読み上げる）、代替の misaki[ja] は
+pyopenjtalk の C++ ビルドに Windows SDK を要求するため断念しました。日本語音声が要る場合は
+`npx hyperframes auth login` で HeyGen にサインインすれば本来の経路が使えます
+（尺の組み直しは発生します）。
+
+動画を編集して作り直す手順:
+
+```bash
+npx hyperframes check ./videos/hyperframes-skills-tour
+```
+
+```bash
+npx hyperframes render ./videos/hyperframes-skills-tour --skill=faceless-explainer --quality high --output renders/video.mp4
+```
+
+書き出した MP4 を `media/hyperframes-skills-tour.mp4` に置き換えてから `npm run build` します。
 
 ## デッキを追加する
 

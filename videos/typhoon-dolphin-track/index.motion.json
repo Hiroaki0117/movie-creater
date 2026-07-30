@@ -1,0 +1,33 @@
+{
+  "duration": 10,
+  "assertions": [
+    {
+      "kind": "appearsBy",
+      "selector": "#headline",
+      "bySec": 0.6
+    },
+    {
+      "kind": "appearsBy",
+      "selector": "#marker-analysis",
+      "bySec": 0.8
+    },
+    {
+      "kind": "appearsBy",
+      "selector": "#circle-f120",
+      "bySec": 6.8
+    },
+    {
+      "kind": "before",
+      "a": "#label-analysis",
+      "b": "#label-f120"
+    },
+    {
+      "kind": "staysInFrame",
+      "selector": "#headline"
+    },
+    {
+      "kind": "staysInFrame",
+      "selector": ".forecast-legend"
+    }
+  ]
+}

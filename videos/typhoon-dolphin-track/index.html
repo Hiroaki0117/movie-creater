@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="ja" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>台風13号 ドルフィン 進路予報</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "TyphoonJP";
+        src:
+          local("Yu Gothic UI"),
+          local("Yu Gothic"),
+          local("Meiryo");
+        font-style: normal;
+        font-weight: 100 900;
+      }
+
+      :root {
+        --ocean: #071827;
+        --ocean-raised: #0d2233;
+        --land: #173247;
+        --coast: #7890a0;
+        --text: #f3f7f9;
+        --muted: #a9bdc9;
+        --grid: #315064;
+        --forecast: #1fd4e5;
+        --forecast-fill: rgba(31, 212, 229, 0.1);
+        --current: #ff6b57;
+        --accent: #ffd45a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--ocean);
+      }
+
+      body {
+        font-family: "TyphoonJP", sans-serif;
+        color: var(--text);
+      }
+
+      #stage {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+
+      .stage-fill {
+        position: absolute;
+        inset: 0;
+        background: var(--ocean);
+      }
+
+      .clip {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+
+      .header {
+        position: absolute;
+        top: 34px;
+        left: 62px;
+        right: 62px;
+        height: 108px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        z-index: 4;
+      }
+
+      .headline-group {
+        max-width: 1160px;
+      }
+
+      .eyebrow {
+        margin-bottom: 4px;
+        color: var(--forecast);
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+      }
+
+      #headline {
+        margin: 0;
+        color: var(--text);
+        font-size: 52px;
+        font-weight: 700;
+        line-height: 1.18;
+        letter-spacing: 0.01em;
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+
+      #uncertainty-message {
+        display: inline-flex;
+        position: relative;
+        margin-top: 7px;
+        padding-bottom: 7px;
+        color: var(--accent);
+        font-size: 24px;
+        font-weight: 700;
+        opacity: 0;
+      }
+
+      #uncertainty-line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 3px;
+        border-radius: 3px;
+        background: var(--accent);
+        transform: scaleX(0);
+        transform-origin: left center;
+      }
+
+      .issue-badge {
+        min-width: 356px;
+        margin-top: 14px;
+        padding: 10px 18px;
+        border: 1px solid #406276;
+        border-radius: 999px;
+        background: var(--ocean-raised);
+        color: var(--text);
+        font-size: 18px;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .map-shell {
+        position: absolute;
+        top: 154px;
+        left: 48px;
+        width: 1824px;
+        height: 794px;
+        overflow: hidden;
+        border: 1px solid #29495d;
+        border-radius: 18px;
+        background: #081b2a;
+        opacity: 0;
+      }
+
+      #forecast-svg {
+        display: block;
+        width: 1824px;
+        height: 794px;
+      }
+
+      .graticule {
+        fill: none;
+        stroke: var(--grid);
+        stroke-width: 1;
+        stroke-opacity: 0.5;
+      }
+
+      .grid-label {
+        fill: #678295;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .land {
+        fill: var(--land);
+        stroke: var(--coast);
+        stroke-width: 1.7;
+        stroke-linejoin: round;
+      }
+
+      .island {
+        fill: #527083;
+        stroke: #9db0bb;
+        stroke-width: 1;
+      }
+
+      .geo-label {
+        fill: #b9c8d0;
+        font-size: 17px;
+        font-weight: 700;
+        paint-order: stroke;
+        stroke: var(--ocean);
+        stroke-width: 5px;
+        stroke-linejoin: round;
+      }
+
+      .geo-sub-label {
+        fill: #8099a8;
+        font-size: 14px;
+        font-weight: 600;
+        paint-order: stroke;
+        stroke: var(--ocean);
+        stroke-width: 4px;
+      }
+
+      .route-shadow,
+      .route-segment {
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .route-shadow {
+        stroke: rgba(7, 24, 39, 0.86);
+        stroke-width: 10;
+      }
+
+      .route-segment {
+        stroke: var(--forecast);
+        stroke-width: 4;
+      }
+
+      .forecast-circle {
+        fill: var(--forecast-fill);
+        stroke: var(--forecast);
+        stroke-width: 2;
+        stroke-dasharray: 8 7;
+        opacity: 0;
+        transform-box: fill-box;
+        transform-origin: center;
+      }
+
+      .forecast-marker {
+        fill: var(--ocean);
+        stroke: var(--accent);
+        stroke-width: 4;
+        opacity: 0;
+        transform-box: fill-box;
+        transform-origin: center;
+      }
+
+      .analysis-halo {
+        fill: rgba(255, 107, 87, 0.18);
+        stroke: var(--current);
+        stroke-width: 2;
+        opacity: 0;
+        transform-box: fill-box;
+        transform-origin: center;
+      }
+
+      .analysis-marker {
+        fill: var(--current);
+        stroke: #fff4ee;
+        stroke-width: 4;
+        opacity: 0;
+        transform-box: fill-box;
+        transform-origin: center;
+      }
+
+      .point-label {
+        opacity: 0;
+      }
+
+      .point-label rect {
+        fill: rgba(8, 27, 42, 0.94);
+        stroke: #426479;
+        stroke-width: 1;
+      }
+
+      .point-label .date {
+        fill: var(--text);
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .point-label .kind {
+        fill: var(--muted);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .leader {
+        stroke: #668496;
+        stroke-width: 1.5;
+      }
+
+      .forecast-legend {
+        position: absolute;
+        top: 176px;
+        right: 78px;
+        width: 392px;
+        padding: 16px 18px;
+        border: 1px solid #406276;
+        border-radius: 12px;
+        background: rgba(8, 27, 42, 0.93);
+        z-index: 3;
+      }
+
+      .legend-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--text);
+        font-size: 17px;
+        font-weight: 700;
+        line-height: 1.45;
+      }
+
+      .legend-symbol {
+        flex: 0 0 auto;
+        width: 38px;
+        height: 24px;
+        border: 2px dashed var(--forecast);
+        border-radius: 50%;
+        background: var(--forecast-fill);
+      }
+
+      .legend-note {
+        margin-top: 7px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .current-card {
+        position: absolute;
+        top: 310px;
+        right: 78px;
+        width: 370px;
+        padding: 15px 18px;
+        border-left: 4px solid var(--current);
+        border-radius: 8px;
+        background: rgba(8, 27, 42, 0.93);
+        color: var(--text);
+        opacity: 0;
+        z-index: 3;
+      }
+
+      .current-card .card-kicker {
+        color: var(--current);
+        font-size: 15px;
+        font-weight: 800;
+      }
+
+      .current-card .card-main {
+        margin-top: 2px;
+        font-size: 21px;
+        font-weight: 700;
+      }
+
+      .current-card .card-stats {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.5;
+      }
+
+      .footer {
+        position: absolute;
+        left: 48px;
+        right: 48px;
+        bottom: 25px;
+        height: 76px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 34px;
+        border-top: 1px solid #29495d;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.5;
+        z-index: 4;
+      }
+
+      .footer strong {
+        color: var(--text);
+        font-weight: 700;
+      }
+
+      .footer .caution {
+        max-width: 760px;
+        text-align: right;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="stage"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="10"
+      data-fps="30"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div class="stage-fill" data-layout-ignore="true"></div>
+
+      <section
+        id="forecast-map"
+        class="clip"
+        data-start="0"
+        data-duration="10"
+        data-track-index="1"
+      >
+        <header class="header">
+          <div class="headline-group">
+            <div class="eyebrow">TYPHOON TRACK FORECAST</div>
+            <h1 id="headline">台風13号　小笠原近海へ西進予報</h1>
+            <div id="uncertainty-message">
+              予報円は将来ほど拡大
+              <span id="uncertainty-line" data-layout-ignore="true"></span>
+            </div>
+          </div>
+          <div class="issue-badge">7月30日 21時45分発表</div>
+        </header>
+
+        <div class="map-shell" id="map-shell">
+          <svg
+            id="forecast-svg"
+            viewBox="0 0 1824 794"
+            role="img"
+            aria-label="台風13号ドルフィンの実況位置と5日先までの予報進路"
+          >
+            <g id="grid-layer" data-layout-ignore="true"></g>
+            <g id="land-layer"></g>
+            <g id="island-layer"></g>
+            <g id="geo-label-layer"></g>
+            <g id="route-shadow-layer" data-layout-ignore="true"></g>
+            <g id="circle-layer"></g>
+            <g id="route-layer"></g>
+            <g id="marker-layer"></g>
+            <g id="point-label-layer"></g>
+          </svg>
+        </div>
+
+        <aside class="forecast-legend">
+          <div class="legend-row">
+            <span class="legend-symbol" data-layout-ignore="true"></span>
+            <span>予報円：中心が70%の確率で入る範囲</span>
+          </div>
+          <div class="legend-note">円が大きいほど、中心位置の予報幅が広いことを示します。</div>
+        </aside>
+
+        <aside class="current-card" id="current-card">
+          <div class="card-kicker">実況　7月30日 21時</div>
+          <div class="card-main">ウェーク島近海</div>
+          <div class="card-stats">中心気圧 910 hPa｜最大風速 55 m/s<br />西北西へ 20 km/h</div>
+        </aside>
+
+        <footer class="footer">
+          <div><strong>出典：気象庁</strong>　2026年7月30日21時45分発表</div>
+          <div class="caution">この映像は気象庁予報の可視化です。予報は変わるため、必ず最新情報をご確認ください。</div>
+        </footer>
+      </section>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var NS = "http://www.w3.org/2000/svg";
+        var WIDTH = 1824;
+        var HEIGHT = 794;
+        var LON_MIN = 128;
+        var LON_MAX = 170;
+        var LAT_MIN = 10;
+        var LAT_MAX = 46;
+
+        var points = [
+          { id: "analysis", kind: "実況", date: "7/30 21時", lat: 17.5, lon: 163.9, radius: 0 },
+          { id: "f12", kind: "予報", date: "7/31 9時", lat: 18.3, lon: 161.7, radius: 45 },
+          { id: "f24", kind: "予報", date: "7/31 21時", lat: 19.3, lon: 159.9, radius: 65 },
+          { id: "f48", kind: "予報", date: "8/1 21時", lat: 21.7, lon: 155.7, radius: 100 },
+          { id: "f72", kind: "予報", date: "8/2 21時", lat: 23.3, lon: 150.4, radius: 150 },
+          { id: "f96", kind: "予報", date: "8/3 21時", lat: 23.7, lon: 145.1, radius: 185 },
+          { id: "f120", kind: "予報", date: "8/4 21時", lat: 24.0, lon: 140.1, radius: 220 },
+        ];
+
+        var labelOffsets = [
+          { x: -138, y: 42 },
+          { x: -150, y: -72 },
+          { x: 28, y: 38 },
+          { x: -132, y: -74 },
+          { x: -62, y: 48 },
+          { x: -68, y: -74 },
+          { x: -112, y: 64 },
+        ];
+
+        function project(lon, lat) {
+          return {
+            x: ((lon - LON_MIN) / (LON_MAX - LON_MIN)) * WIDTH,
+            y: ((LAT_MAX - lat) / (LAT_MAX - LAT_MIN)) * HEIGHT,
+          };
+        }
+
+        function createSvg(tag, attrs, parent) {
+          var element = document.createElementNS(NS, tag);
+          var keys = Object.keys(attrs || {});
+          for (var i = 0; i < keys.length; i += 1) {
+            element.setAttribute(keys[i], String(attrs[keys[i]]));
+          }
+          if (parent) parent.appendChild(element);
+          return element;
+        }
+
+        function polygonPath(coords) {
+          var d = "";
+          for (var i = 0; i < coords.length; i += 1) {
+            var p = project(coords[i][0], coords[i][1]);
+            d += (i === 0 ? "M " : " L ") + p.x.toFixed(1) + " " + p.y.toFixed(1);
+          }
+          return d + " Z";
+        }
+
+        var gridLayer = document.getElementById("grid-layer");
+        for (var lon = 130; lon <= 170; lon += 5) {
+          var top = project(lon, LAT_MAX);
+          var bottom = project(lon, LAT_MIN);
+          createSvg(
+            "line",
+            { class: "graticule", x1: top.x, y1: top.y, x2: bottom.x, y2: bottom.y },
+            gridLayer,
+          );
+          var lonText = createSvg(
+            "text",
+            { class: "grid-label", x: top.x + 6, y: 24 },
+            gridLayer,
+          );
+          lonText.textContent = lon + "°E";
+        }
+        for (var lat = 10; lat <= 45; lat += 5) {
+          var left = project(LON_MIN, lat);
+          var right = project(LON_MAX, lat);
+          createSvg(
+            "line",
+            { class: "graticule", x1: left.x, y1: left.y, x2: right.x, y2: right.y },
+            gridLayer,
+          );
+          var latText = createSvg(
+            "text",
+            { class: "grid-label", x: 10, y: left.y - 7 },
+            gridLayer,
+          );
+          latText.textContent = lat + "°N";
+        }
+
+        var landShapes = [
+          [
+            [128.0, 46.0],
+            [144.0, 46.0],
+            [143.2, 44.4],
+            [141.3, 43.1],
+            [139.5, 41.7],
+            [137.9, 39.8],
+            [135.1, 37.8],
+            [133.0, 35.4],
+            [131.2, 33.2],
+            [128.0, 31.7],
+          ],
+          [
+            [139.5, 45.6],
+            [142.5, 45.4],
+            [145.8, 43.6],
+            [144.1, 41.5],
+            [141.1, 41.2],
+            [139.4, 43.4],
+          ],
+          [
+            [140.9, 41.2],
+            [141.7, 40.2],
+            [141.5, 39.1],
+            [140.7, 38.0],
+            [140.9, 37.0],
+            [140.0, 36.3],
+            [139.0, 35.5],
+            [138.0, 35.1],
+            [136.9, 35.5],
+            [135.7, 34.7],
+            [134.3, 34.4],
+            [132.8, 34.2],
+            [131.0, 34.0],
+            [130.5, 33.4],
+            [132.1, 33.0],
+            [134.0, 33.4],
+            [135.4, 34.0],
+            [137.0, 34.2],
+            [138.5, 34.6],
+            [139.8, 35.2],
+            [140.6, 36.2],
+            [141.2, 37.5],
+            [142.0, 39.1],
+            [142.0, 40.4],
+          ],
+          [
+            [132.2, 33.9],
+            [134.5, 34.4],
+            [134.8, 33.6],
+            [133.6, 33.1],
+            [132.3, 33.3],
+          ],
+          [
+            [130.1, 33.7],
+            [131.9, 33.2],
+            [131.5, 32.0],
+            [130.9, 30.9],
+            [129.7, 31.1],
+            [129.3, 32.4],
+          ],
+        ];
+
+        var landLayer = document.getElementById("land-layer");
+        for (var s = 0; s < landShapes.length; s += 1) {
+          createSvg("path", { class: "land", d: polygonPath(landShapes[s]) }, landLayer);
+        }
+
+        var islandLayer = document.getElementById("island-layer");
+        var islands = [
+          { lon: 129.5, lat: 28.3, r: 4 },
+          { lon: 130.0, lat: 29.3, r: 3 },
+          { lon: 141.3, lat: 24.8, r: 4 },
+          { lon: 142.2, lat: 26.6, r: 3 },
+          { lon: 142.2, lat: 27.1, r: 3 },
+          { lon: 153.98, lat: 24.29, r: 4 },
+          { lon: 145.75, lat: 15.2, r: 3 },
+          { lon: 145.65, lat: 18.8, r: 3 },
+          { lon: 144.8, lat: 13.5, r: 4 },
+          { lon: 166.62, lat: 19.28, r: 4 },
+        ];
+        for (var n = 0; n < islands.length; n += 1) {
+          var islandPoint = project(islands[n].lon, islands[n].lat);
+          createSvg(
+            "circle",
+            { class: "island", cx: islandPoint.x, cy: islandPoint.y, r: islands[n].r },
+            islandLayer,
+          );
+        }
+
+        var geoLabelLayer = document.getElementById("geo-label-layer");
+        var geoLabels = [
+          { text: "日本", lon: 137.3, lat: 39.0, className: "geo-label" },
+          { text: "小笠原諸島", lon: 137.8, lat: 28.5, className: "geo-sub-label" },
+          { text: "南鳥島", lon: 153.3, lat: 25.2, className: "geo-sub-label" },
+          { text: "ウェーク島", lon: 165.1, lat: 20.4, className: "geo-sub-label" },
+        ];
+        for (var g = 0; g < geoLabels.length; g += 1) {
+          var geoPosition = project(geoLabels[g].lon, geoLabels[g].lat);
+          var geoText = createSvg(
+            "text",
+            { class: geoLabels[g].className, x: geoPosition.x, y: geoPosition.y },
+            geoLabelLayer,
+          );
+          geoText.textContent = geoLabels[g].text;
+        }
+
+        var routeShadowLayer = document.getElementById("route-shadow-layer");
+        var routeLayer = document.getElementById("route-layer");
+        for (var segmentIndex = 0; segmentIndex < points.length - 1; segmentIndex += 1) {
+          var a = project(points[segmentIndex].lon, points[segmentIndex].lat);
+          var b = project(points[segmentIndex + 1].lon, points[segmentIndex + 1].lat);
+          var segmentD =
+            "M " + a.x.toFixed(1) + " " + a.y.toFixed(1) + " L " + b.x.toFixed(1) + " " + b.y.toFixed(1);
+          createSvg(
+            "path",
+            { class: "route-shadow", d: segmentD },
+            routeShadowLayer,
+          );
+          createSvg(
+            "path",
+            { id: "route-" + (segmentIndex + 1), class: "route-segment", d: segmentD },
+            routeLayer,
+          );
+        }
+
+        var circleLayer = document.getElementById("circle-layer");
+        var markerLayer = document.getElementById("marker-layer");
+        var labelLayer = document.getElementById("point-label-layer");
+        var pixelsPerLon = WIDTH / (LON_MAX - LON_MIN);
+        var pixelsPerLat = HEIGHT / (LAT_MAX - LAT_MIN);
+
+        for (var pointIndex = 0; pointIndex < points.length; pointIndex += 1) {
+          var item = points[pointIndex];
+          var position = project(item.lon, item.lat);
+
+          if (item.radius > 0) {
+            var latRadians = (item.lat * Math.PI) / 180;
+            var rx = (item.radius / (111.32 * Math.cos(latRadians))) * pixelsPerLon;
+            var ry = (item.radius / 111.32) * pixelsPerLat;
+            createSvg(
+              "ellipse",
+              {
+                id: "circle-" + item.id,
+                class: "forecast-circle",
+                cx: position.x.toFixed(1),
+                cy: position.y.toFixed(1),
+                rx: rx.toFixed(1),
+                ry: ry.toFixed(1),
+              },
+              circleLayer,
+            );
+            createSvg(
+              "circle",
+              {
+                id: "marker-" + item.id,
+                class: "forecast-marker",
+                cx: position.x.toFixed(1),
+                cy: position.y.toFixed(1),
+                r: 8,
+              },
+              markerLayer,
+            );
+          } else {
+            createSvg(
+              "circle",
+              {
+                id: "analysis-halo",
+                class: "analysis-halo",
+                cx: position.x.toFixed(1),
+                cy: position.y.toFixed(1),
+                r: 26,
+              },
+              markerLayer,
+            );
+            createSvg(
+              "circle",
+              {
+                id: "marker-analysis",
+                class: "analysis-marker",
+                cx: position.x.toFixed(1),
+                cy: position.y.toFixed(1),
+                r: 11,
+              },
+              markerLayer,
+            );
+          }
+
+          var offset = labelOffsets[pointIndex];
+          var labelX = position.x + offset.x;
+          var labelY = position.y + offset.y;
+          var group = createSvg(
+            "g",
+            { id: "label-" + item.id, class: "point-label" },
+            labelLayer,
+          );
+          createSvg(
+            "line",
+            {
+              class: "leader",
+              x1: position.x,
+              y1: position.y,
+              x2: labelX + 56,
+              y2: labelY + 22,
+            },
+            group,
+          );
+          createSvg(
+            "rect",
+            { x: labelX, y: labelY, width: 118, height: 48, rx: 8, ry: 8 },
+            group,
+          );
+          var kindText = createSvg(
+            "text",
+            { class: "kind", x: labelX + 10, y: labelY + 17 },
+            group,
+          );
+          kindText.textContent = item.kind;
+          var dateText = createSvg(
+            "text",
+            { class: "date", x: labelX + 10, y: labelY + 38 },
+            group,
+          );
+          dateText.textContent = item.date;
+        }
+
+        window.__timelines = window.__timelines || {};
+        var tl = gsap.timeline({ paused: true });
+
+        tl.fromTo(
+          "#headline",
+          { opacity: 0, x: -30 },
+          { opacity: 1, x: 0, duration: 0.55, ease: "power3.out" },
+          0,
+        );
+        tl.fromTo(
+          "#map-shell",
+          { opacity: 0 },
+          { opacity: 1, duration: 0.45, ease: "power2.out" },
+          0,
+        );
+        tl.fromTo(
+          ["#analysis-halo", "#marker-analysis"],
+          { opacity: 0, scale: 0 },
+          { opacity: 1, scale: 1, duration: 0.38, ease: "power2.out" },
+          0.3,
+        );
+        tl.fromTo(
+          "#label-analysis",
+          { opacity: 0 },
+          { opacity: 1, duration: 0.3, ease: "power1.out" },
+          0.42,
+        );
+        tl.fromTo(
+          "#current-card",
+          { opacity: 0, x: 18 },
+          { opacity: 1, x: 0, duration: 0.38, ease: "power2.out" },
+          0.46,
+        );
+
+        var segmentStarts = [0.85, 1.45, 2.05, 2.98, 4.0, 5.08];
+        var segmentDurations = [0.7, 0.7, 1.05, 1.14, 1.2, 1.27];
+        var arrivalStarts = [1.38, 1.98, 2.88, 3.88, 4.96, 6.1];
+        var forecastIds = ["f12", "f24", "f48", "f72", "f96", "f120"];
+
+        for (var routeIndex = 0; routeIndex < forecastIds.length; routeIndex += 1) {
+          var routePath = document.getElementById("route-" + (routeIndex + 1));
+          var routeLength = routePath.getTotalLength();
+          routePath.style.strokeDasharray = String(routeLength);
+          routePath.style.strokeDashoffset = String(routeLength);
+          tl.to(
+            routePath,
+            {
+              strokeDashoffset: 0,
+              duration: segmentDurations[routeIndex],
+              ease: "power2.inOut",
+            },
+            segmentStarts[routeIndex],
+          );
+
+          var forecastId = forecastIds[routeIndex];
+          tl.fromTo(
+            "#circle-" + forecastId,
+            { opacity: 0, scale: 0.72 },
+            { opacity: 1, scale: 1, duration: 0.44, ease: "power2.out" },
+            arrivalStarts[routeIndex],
+          );
+          tl.fromTo(
+            "#marker-" + forecastId,
+            { opacity: 0, scale: 0 },
+            { opacity: 1, scale: 1, duration: 0.28, ease: "power2.out" },
+            arrivalStarts[routeIndex] + 0.06,
+          );
+          tl.fromTo(
+            "#label-" + forecastId,
+            { opacity: 0 },
+            { opacity: 1, duration: 0.28, ease: "power1.out" },
+            arrivalStarts[routeIndex] + 0.14,
+          );
+        }
+
+        tl.fromTo(
+          "#uncertainty-message",
+          { opacity: 0, y: 10 },
+          { opacity: 1, y: 0, duration: 0.42, ease: "power2.out" },
+          6.95,
+        );
+        tl.fromTo(
+          "#uncertainty-line",
+          { scaleX: 0 },
+          { scaleX: 1, duration: 0.52, ease: "power2.out" },
+          7.08,
+        );
+
+        tl.seek(0);
+        window.__timelines["main"] = tl;
+      })();
+    </script>
+  </body>
+</html>

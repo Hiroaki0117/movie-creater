@@ -1,0 +1,601 @@
+{
+  "status": "final",
+  "search_required": false,
+  "category": "maps",
+  "duration_s": 10,
+  "fps": 30,
+  "canvas": {
+    "w": 1920,
+    "h": 1080,
+    "aspect": "16:9"
+  },
+  "language": "ja",
+  "style": "clean Japanese broadcast weather map; flat vector geography, restrained information hierarchy, no decorative glow or particles",
+  "palette": [
+    "#071827",
+    "#173247",
+    "#7890A0",
+    "#F3F7F9",
+    "#1FD4E5",
+    "#FFD45A",
+    "#FF6B57"
+  ],
+  "font": "Noto Sans JP",
+  "beats": [
+    12,
+    48,
+    90,
+    132,
+    174,
+    216,
+    258,
+    285
+  ],
+  "export": "mp4",
+  "asset_needs": [],
+  "block": "world-map",
+  "customize": {
+    "reuse_strategy": "Borrow the installed compositions/world-map.html D3/TopoJSON projection, SVG path construction, clip-path headline reveal, and paused timeline registration, then adapt the block in place for a western North Pacific forecast track.",
+    "replace": [
+      "Replace the global GDP dataset, choropleth colors, hover tooltip, legend bar, and top-five pulse with the fixed JMA forecast points, route segments, geodesic probability-circle paths, Japanese labels, and persistent forecast legend/footer.",
+      "Replace the full-world Natural Earth fit with the specified regional Mercator viewport.",
+      "Replace Inter with the bundled Noto Sans JP family and remove Google Fonts links.",
+      "Remove every render-time network request. Use project-local or inlined deterministic vector geography and locally available D3/TopoJSON runtime code; do not use live tiles, a live basemap, or remote d3.json fetches.",
+      "Keep the block's paused GSAP timeline and window.__timelines registration, but set the composition duration to 10 seconds."
+    ],
+    "preserve": [
+      "1920x1080 canvas and deterministic SVG rendering",
+      "seek-clock-driven motion only",
+      "neutral geography with color reserved for route, forecast centers, and uncertainty"
+    ]
+  },
+  "shot_brief": "暗い紺色のベクター地図に日本列島と西太平洋を中立色で示し、冒頭0.5秒で「台風13号 ドルフィン」の現在位置を提示する。そこから予報点へ進路線が西寄りに描かれ、各点へ到達するたびに気象庁の予報円が実半径に比例した大きさで順に広がることを単一の支配的モーションにする。後半は拡大する予報円と「予報円は将来ほど拡大」を読ませ、最終位置で静止しても日本上陸を断定する矢印や着地点表現は使わず、気象庁予報の不確実性を伝える。",
+  "content": {
+    "block": "world-map",
+    "lane": "vector",
+    "shot": "flow",
+    "basemap": null,
+    "network_policy": "offline deterministic render; no live basemap, external asset search, remote font, CDN script, remote topology, or render-time fetch",
+    "layout": {
+      "frame_safe_area": {
+        "x": 48,
+        "y": 32,
+        "width": 1824,
+        "height": 1016
+      },
+      "headline": {
+        "x": 64,
+        "y": 42,
+        "width": 1120,
+        "height": 62,
+        "font_size_px": 52,
+        "font_weight": 700,
+        "text": "台風13号　小笠原近海へ西進予報"
+      },
+      "secondary_headline": {
+        "x": 66,
+        "y": 108,
+        "width": 900,
+        "height": 34,
+        "font_size_px": 24,
+        "font_weight": 700,
+        "text": "予報円は将来ほど拡大"
+      },
+      "issue_badge": {
+        "x": 1500,
+        "y": 48,
+        "width": 356,
+        "height": 42,
+        "font_size_px": 18,
+        "text": "7月30日 21時45分発表"
+      },
+      "map_viewport": {
+        "x": 48,
+        "y": 154,
+        "width": 1824,
+        "height": 794,
+        "view_box": "0 0 1824 794",
+        "clip": true
+      },
+      "forecast_legend": {
+        "x": 1462,
+        "y": 176,
+        "width": 374,
+        "height": 82,
+        "font_size_px": 18,
+        "text": "予報円：中心が70%の確率で入る範囲"
+      },
+      "footer": {
+        "x": 48,
+        "y": 964,
+        "width": 1824,
+        "height": 76,
+        "font_size_px": 17,
+        "line_1": "気象庁 2026年7月30日21時45分発表",
+        "line_2": "予報は変わるため、必ず最新情報をご確認ください",
+        "visible_from_frame": 0
+      }
+    },
+    "map_projection": {
+      "type": "d3.geoMercator",
+      "center_longitude": 149,
+      "center_latitude": 27,
+      "scale": 1400,
+      "translate_local": [
+        912,
+        400
+      ],
+      "path_generator": "d3.geoPath().projection(projection)",
+      "probability_geometry": "d3.geoCircle().center([longitude, latitude]).radius(radius_km / 111.195) followed by the same path generator"
+    },
+    "map_extent": {
+      "latitude_min": 10,
+      "latitude_max": 46,
+      "longitude_min": 128,
+      "longitude_max": 170
+    },
+    "label_positions": [
+      {
+        "target": "analysis",
+        "point_screen": [
+          1324,
+          805
+        ],
+        "box": {
+          "x": 1360,
+          "y": 798,
+          "width": 194,
+          "height": 58
+        },
+        "alignment": "left",
+        "text": "実況 7/30 21時",
+        "leader_line": true
+      },
+      {
+        "target": "forecast-12h",
+        "point_screen": [
+          1270,
+          785
+        ],
+        "box": {
+          "x": 1282,
+          "y": 708,
+          "width": 150,
+          "height": 48
+        },
+        "alignment": "left",
+        "text": "7/31 9時",
+        "leader_line": true
+      },
+      {
+        "target": "forecast-24h",
+        "point_screen": [
+          1226,
+          759
+        ],
+        "box": {
+          "x": 1188,
+          "y": 820,
+          "width": 158,
+          "height": 48
+        },
+        "alignment": "center",
+        "text": "7/31 21時",
+        "leader_line": true
+      },
+      {
+        "target": "forecast-48h",
+        "point_screen": [
+          1124,
+          696
+        ],
+        "box": {
+          "x": 1084,
+          "y": 620,
+          "width": 158,
+          "height": 48
+        },
+        "alignment": "center",
+        "text": "8/1 21時",
+        "leader_line": true
+      },
+      {
+        "target": "forecast-72h",
+        "point_screen": [
+          994,
+          654
+        ],
+        "box": {
+          "x": 954,
+          "y": 716,
+          "width": 158,
+          "height": 48
+        },
+        "alignment": "center",
+        "text": "8/2 21時",
+        "leader_line": true
+      },
+      {
+        "target": "forecast-96h",
+        "point_screen": [
+          865,
+          643
+        ],
+        "box": {
+          "x": 826,
+          "y": 562,
+          "width": 158,
+          "height": 48
+        },
+        "alignment": "center",
+        "text": "8/3 21時",
+        "leader_line": true
+      },
+      {
+        "target": "forecast-120h",
+        "point_screen": [
+          743,
+          635
+        ],
+        "box": {
+          "x": 664,
+          "y": 706,
+          "width": 158,
+          "height": 48
+        },
+        "alignment": "center",
+        "text": "8/4 21時",
+        "leader_line": true
+      },
+      {
+        "target": "japan",
+        "box": {
+          "x": 438,
+          "y": 294,
+          "width": 104,
+          "height": 38
+        },
+        "alignment": "center",
+        "text": "日本",
+        "leader_line": false
+      },
+      {
+        "target": "ogasawara",
+        "anchor_screen": [
+          789,
+          554
+        ],
+        "box": {
+          "x": 606,
+          "y": 518,
+          "width": 146,
+          "height": 40
+        },
+        "alignment": "center",
+        "text": "小笠原諸島",
+        "leader_line": true
+      }
+    ],
+    "regions": [
+      {
+        "id": "japan",
+        "label": "日本",
+        "treatment": "neutral outline and muted fill; never pulse, highlight, or imply an impact target"
+      },
+      {
+        "id": "ogasawara",
+        "label": "小笠原諸島",
+        "treatment": "small neutral geographic label offset from the route and probability circles"
+      }
+    ],
+    "points": [
+      {
+        "id": "analysis",
+        "kind": "実況",
+        "valid_jst": "2026-07-30T21:00:00+09:00",
+        "label": "7/30 21時",
+        "latitude": 17.5,
+        "longitude": 163.9,
+        "location": "ウェーク島近海",
+        "probability_circle_radius_km": null
+      },
+      {
+        "id": "forecast-12h",
+        "kind": "予報",
+        "valid_jst": "2026-07-31T09:00:00+09:00",
+        "label": "7/31 9時",
+        "latitude": 18.3,
+        "longitude": 161.7,
+        "location": "ウェーク島近海",
+        "probability_circle_radius_km": 45
+      },
+      {
+        "id": "forecast-24h",
+        "kind": "予報",
+        "valid_jst": "2026-07-31T21:00:00+09:00",
+        "label": "7/31 21時",
+        "latitude": 19.3,
+        "longitude": 159.9,
+        "location": "ウェーク島近海",
+        "probability_circle_radius_km": 65
+      },
+      {
+        "id": "forecast-48h",
+        "kind": "予報",
+        "valid_jst": "2026-08-01T21:00:00+09:00",
+        "label": "8/1 21時",
+        "latitude": 21.7,
+        "longitude": 155.7,
+        "location": "南鳥島近海",
+        "probability_circle_radius_km": 100
+      },
+      {
+        "id": "forecast-72h",
+        "kind": "予報",
+        "valid_jst": "2026-08-02T21:00:00+09:00",
+        "label": "8/2 21時",
+        "latitude": 23.3,
+        "longitude": 150.4,
+        "location": "南鳥島近海",
+        "probability_circle_radius_km": 150
+      },
+      {
+        "id": "forecast-96h",
+        "kind": "予報",
+        "valid_jst": "2026-08-03T21:00:00+09:00",
+        "label": "8/3 21時",
+        "latitude": 23.7,
+        "longitude": 145.1,
+        "location": "小笠原近海",
+        "probability_circle_radius_km": 185
+      },
+      {
+        "id": "forecast-120h",
+        "kind": "予報",
+        "valid_jst": "2026-08-04T21:00:00+09:00",
+        "label": "8/4 21時",
+        "latitude": 24,
+        "longitude": 140.1,
+        "location": "小笠原近海",
+        "probability_circle_radius_km": 220
+      }
+    ],
+    "probability_circles": {
+      "meaning": "台風の中心が70%の確率で入ると予想される範囲",
+      "radius_source": "points[].probability_circle_radius_km",
+      "scale_rule": "project every radius geodesically from its center so on-screen circle diameters remain directly proportional to 45, 65, 100, 150, 185, and 220 km",
+      "expected_radius_px_at_scale_1400": [
+        {
+          "point_id": "forecast-12h",
+          "radius_km": 45,
+          "radius_px": 9.9
+        },
+        {
+          "point_id": "forecast-24h",
+          "radius_km": 65,
+          "radius_px": 14.3
+        },
+        {
+          "point_id": "forecast-48h",
+          "radius_km": 100,
+          "radius_px": 22
+        },
+        {
+          "point_id": "forecast-72h",
+          "radius_km": 150,
+          "radius_px": 33
+        },
+        {
+          "point_id": "forecast-96h",
+          "radius_km": 185,
+          "radius_px": 40.7
+        },
+        {
+          "point_id": "forecast-120h",
+          "radius_km": 220,
+          "radius_px": 48.3
+        }
+      ],
+      "treatment": "1.8 px cyan outline at 85% opacity with cyan fill at 11% opacity; no cone, glow, bloom, or alarm-color target treatment"
+    },
+    "route": {
+      "direction": "west-northwest",
+      "start_point_id": "analysis",
+      "end_point_id": "forecast-120h",
+      "treatment": "one continuous route draw-on in chronological order; stop at the final forecast center without extending an arrow toward Japan"
+    },
+    "headline": "台風13号　小笠原近海へ西進予報",
+    "secondary_headline": "予報円は将来ほど拡大",
+    "overlays": [
+      {
+        "type": "label",
+        "content": "実況",
+        "anchor": "analysis"
+      },
+      {
+        "type": "label",
+        "content": "予報",
+        "anchor": "forecast-points"
+      },
+      {
+        "type": "legend",
+        "content": "予報円：中心が70%の確率で入る範囲",
+        "position": "upper-right safe area"
+      },
+      {
+        "type": "footer",
+        "content": "気象庁 2026年7月30日21時45分発表｜予報は変わるため、必ず最新情報をご確認ください",
+        "position": "bottom safe area",
+        "persistent": true
+      }
+    ],
+    "motion": {
+      "dominant_idea": "The route draws westward in six chronological segments; each forecast center and its correctly scaled uncertainty circle arrive as the line reaches it.",
+      "gsap_primitives": [
+        "headline clip-path wipe: tl.to(headline, {clipPath:'inset(0 0% 0 0)', duration:0.55, ease:'power3.inOut'}, 0)",
+        "map fade_in: tl.to(mapLayer, {opacity:1, duration:0.45, ease:'power2.out'}, 0)",
+        "route draw-on: gsap.set(segment, {strokeDasharray:length, strokeDashoffset:length}); tl.to(segment, {strokeDashoffset:0, ease:'power2.inOut'})",
+        "forecast marker scale_grow: gsap.set(marker, {scale:0, opacity:0, transformOrigin:'center center'}); tl.to(marker, {scale:1, opacity:1, duration:0.28, ease:'power2.out'})",
+        "probability circle scale_grow + fade_in: gsap.set(circle, {scale:0.72, opacity:0, transformOrigin:'center center'}); tl.to(circle, {scale:1, opacity:1, duration:0.44, ease:'power2.out'})",
+        "label fade_in: gsap.set(label, {opacity:0}); tl.to(label, {opacity:1, duration:0.28, ease:'power1.out'})",
+        "secondary headline fade_in + underline_sweep: opacity 0 to 1, then scaleX 0 to 1 from left center"
+      ],
+      "initial_state": [
+        "Footer, issue badge, map frame, and forecast meaning legend are visible from frame 0.",
+        "Headline starts at clipPath inset(0 100% 0 0).",
+        "Geography starts at opacity 0; no country-by-country decorative stagger.",
+        "Every route segment starts at full strokeDashoffset.",
+        "Forecast markers and labels start at opacity 0; markers start at scale 0.",
+        "Probability-circle paths start at opacity 0 and scale 0.72 around their own projected centers.",
+        "Secondary headline and underline start hidden."
+      ],
+      "timeline": [
+        {
+          "start_s": 0,
+          "end_s": 0.55,
+          "targets": "headline, neutral map geography",
+          "primitive": "clip-path wipe + fade_in"
+        },
+        {
+          "start_s": 0.3,
+          "end_s": 0.68,
+          "targets": "analysis marker and 実況 label",
+          "primitive": "scale_grow + fade_in"
+        },
+        {
+          "start_s": 0.85,
+          "end_s": 1.55,
+          "targets": "analysis to forecast-12h route segment",
+          "primitive": "stroke-dashoffset draw-on"
+        },
+        {
+          "start_s": 1.38,
+          "end_s": 1.82,
+          "targets": "forecast-12h marker, label, 45 km circle",
+          "primitive": "scale_grow + fade_in"
+        },
+        {
+          "start_s": 1.45,
+          "end_s": 2.15,
+          "targets": "forecast-12h to forecast-24h route segment",
+          "primitive": "stroke-dashoffset draw-on"
+        },
+        {
+          "start_s": 1.98,
+          "end_s": 2.42,
+          "targets": "forecast-24h marker, label, 65 km circle",
+          "primitive": "scale_grow + fade_in"
+        },
+        {
+          "start_s": 2.05,
+          "end_s": 3.1,
+          "targets": "forecast-24h to forecast-48h route segment",
+          "primitive": "stroke-dashoffset draw-on"
+        },
+        {
+          "start_s": 2.88,
+          "end_s": 3.36,
+          "targets": "forecast-48h marker, label, 100 km circle",
+          "primitive": "scale_grow + fade_in"
+        },
+        {
+          "start_s": 2.98,
+          "end_s": 4.12,
+          "targets": "forecast-48h to forecast-72h route segment",
+          "primitive": "stroke-dashoffset draw-on"
+        },
+        {
+          "start_s": 3.88,
+          "end_s": 4.38,
+          "targets": "forecast-72h marker, label, 150 km circle",
+          "primitive": "scale_grow + fade_in"
+        },
+        {
+          "start_s": 4,
+          "end_s": 5.2,
+          "targets": "forecast-72h to forecast-96h route segment",
+          "primitive": "stroke-dashoffset draw-on"
+        },
+        {
+          "start_s": 4.96,
+          "end_s": 5.48,
+          "targets": "forecast-96h marker, label, 185 km circle",
+          "primitive": "scale_grow + fade_in"
+        },
+        {
+          "start_s": 5.08,
+          "end_s": 6.35,
+          "targets": "forecast-96h to forecast-120h route segment",
+          "primitive": "stroke-dashoffset draw-on"
+        },
+        {
+          "start_s": 6.1,
+          "end_s": 6.66,
+          "targets": "forecast-120h marker, label, 220 km circle",
+          "primitive": "scale_grow + fade_in"
+        },
+        {
+          "start_s": 6.95,
+          "end_s": 7.55,
+          "targets": "secondary headline and underline",
+          "primitive": "fade_in + underline_sweep",
+          "purpose": "single pattern interrupt that shifts attention from direction to increasing uncertainty"
+        },
+        {
+          "start_s": 7.55,
+          "end_s": 10,
+          "targets": "complete route, all circles, labels, legend, footer",
+          "primitive": "static hold"
+        }
+      ],
+      "seek_safety": [
+        "Register one paused GSAP timeline as window.__timelines['world-map'].",
+        "Apply all delayed hidden states with gsap.set before adding tweens.",
+        "Use no tl.call, Date.now, Math.random, stateful counter, hover behavior, or network-dependent callback.",
+        "Use the same projection for coastline, route points, and d3.geoCircle paths.",
+        "Animate final opacity and transforms only; the final geodesic circle geometry remains exact."
+      ]
+    },
+    "timing": [
+      {
+        "start_s": 0,
+        "end_s": 0.85,
+        "action": "地図、タイトル、実況点を成立させる。出典・発表時刻・注意書きはフレーム0から表示する"
+      },
+      {
+        "start_s": 0.85,
+        "end_s": 6.66,
+        "action": "進路線を時系列に描画し、到達ごとに予報点・日時・実半径比例の予報円を重ねる"
+      },
+      {
+        "start_s": 6.95,
+        "end_s": 7.55,
+        "action": "見出しを「予報円は将来ほど拡大」へ切り替える"
+      },
+      {
+        "start_s": 7.55,
+        "end_s": 10,
+        "action": "全予報円と最終位置を保持し、不確実性の凡例と最新情報確認の注意を読ませる"
+      }
+    ],
+    "safety": {
+      "forecast_only": true,
+      "avoid_landfall_implication": true,
+      "rules": [
+        "日本列島を到達点として強調しない",
+        "最終予報点から先へ矢印や進路線を延長しない",
+        "上陸、直撃、接近確実などの断定表現を使わない",
+        "発表時刻、気象庁出典、最新情報確認の注意書きを常時表示する"
+      ]
+    },
+    "data_source": {
+      "organization": "気象庁",
+      "issue_jst": "2026-07-30T21:45:00+09:00",
+      "snapshot": "data/jma-typhoon-2613.json",
+      "target_url": "https://www.jma.go.jp/bosai/typhoon/data/targetTc.json",
+      "forecast_url": "https://www.jma.go.jp/bosai/typhoon/data/TC2615/forecast.json",
+      "specifications_url": "https://www.jma.go.jp/bosai/typhoon/data/TC2615/specifications.json",
+      "attribution_text": "出典：気象庁（2026年7月30日21時45分発表）"
+    }
+  }
+}

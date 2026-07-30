@@ -1,0 +1,94 @@
+{
+  "source": {
+    "organization": "気象庁",
+    "target_url": "https://www.jma.go.jp/bosai/typhoon/data/targetTc.json",
+    "forecast_url": "https://www.jma.go.jp/bosai/typhoon/data/TC2615/forecast.json",
+    "specifications_url": "https://www.jma.go.jp/bosai/typhoon/data/TC2615/specifications.json",
+    "retrieved_on": "2026-07-30T21:45:00+09:00",
+    "issue_jst": "2026-07-30T21:45:00+09:00"
+  },
+  "typhoon": {
+    "tropical_cyclone_id": "TC2615",
+    "number": "13",
+    "name_ja": "ドルフィン",
+    "name_en": "Dolphin"
+  },
+  "analysis": {
+    "valid_jst": "2026-07-30T21:00:00+09:00",
+    "latitude": 17.5,
+    "longitude": 163.9,
+    "location": "ウェーク島近海",
+    "course": "西北西",
+    "speed_kmh": 20,
+    "central_pressure_hpa": 910,
+    "maximum_wind_ms": 55,
+    "maximum_gust_ms": 80,
+    "intensity": "猛烈な"
+  },
+  "forecast": [
+    {
+      "advanced_hours": 12,
+      "valid_jst": "2026-07-31T09:00:00+09:00",
+      "latitude": 18.3,
+      "longitude": 161.7,
+      "probability_circle_radius_km": 45,
+      "central_pressure_hpa": 905,
+      "maximum_wind_ms": 60,
+      "location": "ウェーク島近海"
+    },
+    {
+      "advanced_hours": 24,
+      "valid_jst": "2026-07-31T21:00:00+09:00",
+      "latitude": 19.3,
+      "longitude": 159.9,
+      "probability_circle_radius_km": 65,
+      "central_pressure_hpa": 905,
+      "maximum_wind_ms": 60,
+      "location": "ウェーク島近海"
+    },
+    {
+      "advanced_hours": 48,
+      "valid_jst": "2026-08-01T21:00:00+09:00",
+      "latitude": 21.7,
+      "longitude": 155.7,
+      "probability_circle_radius_km": 100,
+      "central_pressure_hpa": 920,
+      "maximum_wind_ms": 55,
+      "location": "南鳥島近海"
+    },
+    {
+      "advanced_hours": 72,
+      "valid_jst": "2026-08-02T21:00:00+09:00",
+      "latitude": 23.3,
+      "longitude": 150.4,
+      "probability_circle_radius_km": 150,
+      "central_pressure_hpa": 935,
+      "maximum_wind_ms": 50,
+      "location": "南鳥島近海"
+    },
+    {
+      "advanced_hours": 96,
+      "valid_jst": "2026-08-03T21:00:00+09:00",
+      "latitude": 23.7,
+      "longitude": 145.1,
+      "probability_circle_radius_km": 185,
+      "central_pressure_hpa": 935,
+      "maximum_wind_ms": 50,
+      "location": "小笠原近海"
+    },
+    {
+      "advanced_hours": 120,
+      "valid_jst": "2026-08-04T21:00:00+09:00",
+      "latitude": 24.0,
+      "longitude": 140.1,
+      "probability_circle_radius_km": 220,
+      "central_pressure_hpa": 940,
+      "maximum_wind_ms": 45,
+      "location": "小笠原近海"
+    }
+  ],
+  "interpretation": {
+    "probability_circle_meaning": "台風の中心が70%の確率で入ると予想される範囲",
+    "caution": "予報は変わるため、必ず最新の気象庁情報を確認してください。"
+  }
+}

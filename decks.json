@@ -27,6 +27,18 @@
       "note": "ナレーションなし。画面のタイポグラフィと図で読ませる構成です。",
       "accent": "#cc785c",
       "tags": ["解説動画", "日本語", "無音"]
+    },
+    {
+      "id": "typhoon-dolphin-track",
+      "title": "台風13号 ドルフィン 進路予報",
+      "subtitle": "気象庁の予報円を時系列で可視化",
+      "description": "2026年7月30日21時45分発表の気象庁データを基に、実況位置から5日先までの進路と、将来ほど広がる予報円を日本周辺の地図上で表現します。",
+      "project": "videos/typhoon-dolphin-track",
+      "src": "/media/typhoon-dolphin-track.mp4",
+      "poster": "/media/typhoon-dolphin-track-poster.png",
+      "note": "無音・10秒。予報は変わるため、必ず最新の気象庁情報をご確認ください。",
+      "accent": "#1fd4e5",
+      "tags": ["台風情報", "気象庁データ", "日本語", "無音"]
     }
   ]
 }

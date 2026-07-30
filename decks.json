@@ -17,18 +17,6 @@
   ],
   "videos": [
     {
-      "id": "hyperframes-skills-tour",
-      "title": "スキルの使い方と、作れるもの",
-      "subtitle": "一言から MP4 が出るまで",
-      "description": "前半で「/hyperframes に一言投げてから MP4 が出るまで」の流れを1本追い、後半で入力の種類ごとに何が作れるのかを一覧します。内部仕様ではなく、使う側から見た HyperFrames。",
-      "project": "videos/hyperframes-skills-tour",
-      "src": "/media/hyperframes-skills-tour.mp4",
-      "poster": "/media/hyperframes-skills-tour-poster.png",
-      "note": "ナレーションなし。画面のタイポグラフィと図で読ませる構成です。",
-      "accent": "#cc785c",
-      "tags": ["解説動画", "日本語", "無音"]
-    },
-    {
       "id": "typhoon-dolphin-track",
       "title": "台風13号 ドルフィン 進路予報",
       "subtitle": "気象庁の予報円を時系列で可視化",
@@ -39,6 +27,18 @@
       "note": "無音・10秒。予報は変わるため、必ず最新の気象庁情報をご確認ください。",
       "accent": "#1fd4e5",
       "tags": ["台風情報", "気象庁データ", "日本語", "無音"]
+    },
+    {
+      "id": "hyperframes-skills-tour",
+      "title": "スキルの使い方と、作れるもの",
+      "subtitle": "一言から MP4 が出るまで",
+      "description": "前半で「/hyperframes に一言投げてから MP4 が出るまで」の流れを1本追い、後半で入力の種類ごとに何が作れるのかを一覧します。内部仕様ではなく、使う側から見た HyperFrames。",
+      "project": "videos/hyperframes-skills-tour",
+      "src": "/media/hyperframes-skills-tour.mp4",
+      "poster": "/media/hyperframes-skills-tour-poster.png",
+      "note": "ナレーションなし。画面のタイポグラフィと図で読ませる構成です。",
+      "accent": "#cc785c",
+      "tags": ["解説動画", "日本語", "無音"]
     }
   ]
 }
